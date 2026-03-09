@@ -165,17 +165,90 @@ nav {
 }
 
 .user-avatar {
-    width: 28px;
+    min-width: 28px;  /* ukuran minimal */
     height: 28px;
+    padding: 0 12px;  /* padding kiri-kanan */
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 50%;
-    display: flex;
+    border-radius: 35%;
+    display: inline-flex;  /* inline-flex agar mengikuti konten */
     align-items: center;
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
     color: #fff;
     flex-shrink: 0;
+    white-space: nowrap;  /* mencegah teks turun ke bawah */
+}
+
+/* Style untuk icon button */
+.icon-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #6c757d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icon-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #495057;
+}
+
+/* Style untuk icon notifikasi */
+#notificationIcon {
+    font-size: 1.2rem;
+}
+
+/* Style untuk badge notifikasi */
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #dc3545;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Variasi jika ingin menggunakan icon berbeda */
+/* Icon bel biasa */
+.fa-bell {
+    /* default */
+}
+
+/* Icon bel dengan notifikasi (solid) */
+.fa-bell.active {
+    color: #ffc107;
+}
+
+/* Animasi untuk notifikasi baru */
+@keyframes ring {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    50% { transform: rotate(-15deg); }
+    75% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.notification-badge.has-new {
+    animation: ring 0.5s ease-in-out;
+    background: #ffc107;
 }
 
 .user-info {
