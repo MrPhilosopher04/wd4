@@ -1,0 +1,92 @@
+.container {
+    --uib-size: 50px;
+    --uib-speed: 1.5s;
+    --uib-color-blue: #3498db;
+    --uib-color-green: #2ecc71;
+    --uib-color-red: #e74c3c;
+    height: var(--uib-size);
+    width: var(--uib-size);
+    transform-origin: center;
+    animation:
+        rotate var(--uib-speed) linear infinite,
+        change-shadow calc(var(--uib-speed) * 3) ease-in-out infinite;
+    will-change: transform;
+    overflow: visible;
+}
+
+.car {
+    fill: none;
+    stroke: var(--uib-color-blue);
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    stroke-width: 6px;
+    will-change: stroke-dasharray, stroke-dashoffset, stroke;
+    transition: stroke 0.5s ease;
+    animation:
+        stretch calc(var(--uib-speed) * 0.75) ease-in-out infinite,
+        change-color calc(var(--uib-speed) * 3) ease-in-out infinite;
+}
+
+.track {
+    fill: none;
+    stroke: var(--uib-color-blue);
+    stroke-width: 6px;
+    opacity: 0.15;
+    transition: stroke 0.5s ease;
+    animation: change-color calc(var(--uib-speed) * 3) ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes stretch {
+    0% {
+        stroke-dasharray: 0, 150;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 75, 150;
+        stroke-dashoffset: -25;
+    }
+
+    100% {
+        stroke-dashoffset: -100;
+    }
+}
+
+@keyframes change-color {
+
+    0%,
+    100% {
+        stroke: var(--uib-color-blue);
+    }
+
+    33% {
+        stroke: var(--uib-color-green);
+    }
+
+    66% {
+        stroke: var(--uib-color-red);
+    }
+}
+
+@keyframes change-shadow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px var(--uib-color-blue));
+    }
+
+    33% {
+        filter: drop-shadow(0 0 4px var(--uib-color-green));
+    }
+
+    66% {
+        filter: drop-shadow(0 0 4px var(--uib-color-red));
+    }
+}
