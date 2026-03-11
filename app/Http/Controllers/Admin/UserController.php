@@ -14,8 +14,8 @@ class UserController
      */
     public function index()
     {
-        $users = User::with('role')->get();
-        return view('admin.users.index',compact('users'));
+        $users = User::with('role')->latest()->get();
+        return view('admin.layout.users', compact('users'));
     }
 
     /**
@@ -24,7 +24,7 @@ class UserController
     public function create()
     {
         $roles = Role::all();
-        return view('admin.users.create',compact('roles'));
+        return view('admin.users.create', compact('roles'));
     }
 
     /**
@@ -39,7 +39,7 @@ class UserController
             'role_id'=>$request->role_id
         ]);
 
-        return redirect('/admin/users')->with('success','User Created');
+        return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
@@ -47,10 +47,10 @@ class UserController
      */
     public function edit(string $id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         $roles = Role::all();
 
-        return view('admin.users.edit',compact('user','roles'));
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -58,16 +58,16 @@ class UserController
      */
     public function update(Request $request, string $id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
-        $user->update([
-            'nik'=>$request->nik,
-            'name'=>$request->name,
-            'password'=>Hash::make($request->password),
-            'role_id'=>$request->role_id
-        ]);
+        $data = $request->only('name', 'nik', 'role_id');
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
 
-        return redirect('/admin/users')->with('success','User Updated');
+        $user->update($data);
+
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
 
     /**
@@ -76,6 +76,6 @@ class UserController
     public function destroy(string $id)
     {
         User::destroy($id);
-        return back();
+        return redirect()->route('users.index')->with('success', 'User berhasil dihapus.');
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PageController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\DashboardController;
 
 /*
@@ -71,9 +73,22 @@ Route::middleware(['auth', 'role:unit_kerja'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->middleware(['auth', 'role:admin']);
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'role:admin']);
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Route untuk user management
+Route::get('/users', [UserController::class, 'index'])->name('users');
+
+Route::get('/profiles', [DashboardController::class, 'profiles'])->name('profiles');
+
+// Atau jika ingin route utama mengarah ke dashboard
+Route::get('/', function () {
+    return redirect()->route('dashboard');
 });
