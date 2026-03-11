@@ -67,14 +67,16 @@
                 Dashboard
             </a>
 
-            <!-- Data Master dropdown -->
-            <div id="dataMasterParent" class="menu-item" style="flex-direction:column; align-items:stretch; padding:0;">
-                <div id="dataMasterBtn" class="menu-item" style="margin:0; cursor: pointer;">
+            @php
+                $isUserManagementActive = request()->routeIs('users') || request()->routeIs('roles.*') || request()->routeIs('profiles');
+            @endphp
+            <div id="dataMasterParent" class="menu-item {{ $isUserManagementActive ? 'active' : '' }}" style="flex-direction:column; align-items:stretch; padding:0;">
+                <div id="dataMasterBtn" class="menu-item {{ $isUserManagementActive ? 'submenu-open' : '' }}" style="margin:0; cursor: pointer;">
                     <div class="menu-icon"><i class="fas fa-users"></i></div>
                     <span style="flex:1; font-size:13px; font-weight:600;">User Management</span>
                     <i class="fas fa-chevron-down menu-chevron"></i>
                 </div>
-                <div class="submenu" id="dataMasterSub">
+                <div class="submenu {{ $isUserManagementActive ? 'open' : '' }}" id="dataMasterSub">
                     <a class="submenu-item {{ request()->routeIs('users') ? 'active' : '' }}" href="{{ route('users') }}">
                         <span class="submenu-dot"></span>Users
                     </a>
