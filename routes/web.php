@@ -73,7 +73,7 @@ Route::middleware(['auth', 'role:unit_kerja'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'role:admin']);
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'role:admin'])->name('admin.dashboard');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 

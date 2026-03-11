@@ -14,33 +14,54 @@
         <p id="pageDesc">Kelola data profil pengguna.</p>
     </div>
 
-    <div class="card">
-        <div class="card-header">
+    <div class="card um-card">
+        <div class="card-header um-header">
             <div class="card-title"><i class="fas fa-id-card"></i> Daftar Profil Pengguna</div>
         </div>
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap um-table-wrap">
+            <table class="um-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nama Pengguna</th>
-                        <th>Jabatan</th>
-                        <th>Jurusan</th>
-                        <th>Unit Kerja</th>
+                        <th class="um-th um-th-num">#</th>
+                        <th class="um-th">Nama Pengguna</th>
+                        <th class="um-th">Jabatan</th>
+                        <th class="um-th">Jurusan</th>
+                        <th class="um-th">Unit Kerja</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($profiles as $i => $profile)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $profile->user->name ?? 'N/A' }}</td>
-                        <td>{{ $profile->jabatan ?? 'N/A' }}</td>
-                        <td>{{ $profile->nama_jurusan ?? 'N/A' }}</td>
-                        <td>{{ $profile->nama_unit ?? 'N/A' }}</td>
+                    <tr class="um-row">
+                        <td class="um-td um-td-num">
+                            <span class="um-num">{{ $i + 1 }}</span>
+                        </td>
+                        <td class="um-td">
+                            <div class="user-cell um-user-cell">
+                                <div class="avatar um-avatar um-avatar-color-{{ ($i % 6) }}">{{ strtoupper(substr($profile->user?->name ?? '??', 0, 2)) }}</div>
+                                <span class="um-name">{{ $profile->user?->name ?? '-' }}</span>
+                            </div>
+                        </td>
+                        <td class="um-td">
+                            <span class="um-meta">{{ $profile->jabatan ?? '-' }}</span>
+                        </td>
+                        <td class="um-td">
+                            <span class="um-meta">{{ $profile->nama_jurusan ?? '-' }}</span>
+                        </td>
+                        <td class="um-td">
+                            <span class="um-meta">{{ $profile->nama_unit ?? '-' }}</span>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" style="text-align:center;">Belum ada data profil.</td>
+                        <td colspan="5" class="um-empty">
+                            <div class="um-empty-state">
+                                <div class="um-empty-icon">
+                                    <i class="fas fa-id-card-clip"></i>
+                                </div>
+                                <p class="um-empty-title">Belum ada data profil</p>
+                                <p class="um-empty-sub">Profil pengguna akan muncul secara otomatis ketika data pengguna ditambahkan.</p>
+                            </div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

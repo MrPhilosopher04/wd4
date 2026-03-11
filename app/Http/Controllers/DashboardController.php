@@ -29,7 +29,7 @@ class DashboardController
     // page halaman admin
     public function admin()
     {
-        return view('admin.dashboard');
+        return redirect()->route('dashboard');
     }
 
     public function users()

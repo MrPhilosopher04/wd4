@@ -12,12 +12,15 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}" data-turbo-track="reload">
+    <script src="https://unpkg.com/@hotwired/turbo@7.3.0/dist/turbo.es2017-umd.js" data-turbo-track="reload"></script>
+    <meta name="turbo-cache-control" content="no-preview">
+    @yield('styles')
 </head>
 
 <body>
     <!-- navbar -->
-    <nav>
+    <nav id="navbar">
         <div class="nav-inner">
             <div class="nav-brand">
                 <button id="hamburger" aria-label="Toggle sidebar">
@@ -62,13 +65,13 @@
         <aside id="sidebar">
             <div class="menu-section">Administration</div>
 
-            <a class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+            <a class="menu-item {{ request()->routeIs('dashboard', 'admin.dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
                 <div class="menu-icon"><i class="fas fa-tachometer-alt"></i></div>
                 Dashboard
             </a>
 
             @php
-                $isUserManagementActive = request()->routeIs('users') || request()->routeIs('roles.*') || request()->routeIs('profiles');
+                $isUserManagementActive = request()->routeIs('users', 'users.*', 'roles', 'roles.*', 'profiles', 'profiles.*');
             @endphp
             <div id="dataMasterParent" class="menu-item {{ $isUserManagementActive ? 'active' : '' }}" style="flex-direction:column; align-items:stretch; padding:0;">
                 <div id="dataMasterBtn" class="menu-item {{ $isUserManagementActive ? 'submenu-open' : '' }}" style="margin:0; cursor: pointer;">
@@ -77,13 +80,13 @@
                     <i class="fas fa-chevron-down menu-chevron"></i>
                 </div>
                 <div class="submenu {{ $isUserManagementActive ? 'open' : '' }}" id="dataMasterSub">
-                    <a class="submenu-item {{ request()->routeIs('users') ? 'active' : '' }}" href="{{ route('users') }}">
+                    <a class="submenu-item {{ request()->routeIs('users', 'users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                         <span class="submenu-dot"></span>Users
                     </a>
-                    <a class="submenu-item {{ request()->routeIs('roles.index') ? 'active' : '' }}" href="{{ route('roles.index') }}">
+                    <a class="submenu-item {{ request()->routeIs('roles', 'roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
                         <span class="submenu-dot"></span>Roles
                     </a>
-                    <a class="submenu-item {{ request()->routeIs('profiles') ? 'active' : '' }}" href="{{ route('profiles') }}">
+                    <a class="submenu-item {{ request()->routeIs('profiles', 'profiles.*') ? 'active' : '' }}" href="{{ route('profiles') }}">
                         <span class="submenu-dot"></span>Profiles
                     </a>
                 </div>
@@ -96,7 +99,8 @@
         <div id="sidebarOverlay"></div>
     </div>
 
-    <script src="{{ asset('js/admin/dashboard.js') }}"></script>
+    <script src="{{ asset('js/admin/dashboard.js') }}" data-turbo-track="reload"></script>
+    @yield('scripts')
 </body>
 
 </html>

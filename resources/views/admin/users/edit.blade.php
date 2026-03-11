@@ -16,43 +16,263 @@
         <p id="pageDesc">Ubah data pengguna yang sudah ada di sistem.</p>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title"><i class="fas fa-edit"></i> Formulir Edit Pengguna</div>
+    <div class="ue-layout">
+
+        {{-- ── Kiri: Info Panel ───────────────────────────── --}}
+        <div class="ue-side-col">
+
+            {{-- Profile Card --}}
+            <div class="card ue-profile-card">
+                <div class="ue-profile-top">
+                    <div class="ue-avatar-ring" id="previewRing">
+                        <div class="ue-avatar-lg" id="previewAvatar">
+                            {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(strstr($user->name, ' ') ?: $user->name, 1, 1)) }}
+                        </div>
+                    </div>
+                    <div class="ue-profile-name" id="previewName">{{ $user->name }}</div>
+                    <div class="ue-profile-nik" id="previewNik">NIK: {{ $user->nik }}</div>
+                    <div class="ue-profile-badge" id="previewRole">
+                        {{ $user->role?->role_name ?? 'Tidak Ada Role' }}
+                    </div>
+                    <div class="ue-profile-since">
+                        <i class="fas fa-clock"></i>
+                        Dibuat {{ $user->created_at?->diffForHumans() ?? '-' }}
+                    </div>
+                </div>
+
+                <div class="ue-profile-divider"></div>
+
+                <div class="ue-profile-info">
+                    <div class="ue-info-row">
+                        <span class="ue-info-icon" style="background:rgba(79,70,229,.1);color:#4f46e5;">
+                            <i class="fas fa-briefcase"></i>
+                        </span>
+                        <div>
+                            <div class="ue-info-label">Jabatan</div>
+                            <div class="ue-info-val" id="previewJabatan">{{ $user->profile?->jabatan ?: '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="ue-info-row">
+                        <span class="ue-info-icon" style="background:rgba(14,165,233,.1);color:#0ea5e9;">
+                            <i class="fas fa-graduation-cap"></i>
+                        </span>
+                        <div>
+                            <div class="ue-info-label">Jurusan</div>
+                            <div class="ue-info-val" id="previewJurusan">{{ $user->profile?->nama_jurusan ?: '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="ue-info-row">
+                        <span class="ue-info-icon" style="background:rgba(16,185,129,.1);color:#10b981;">
+                            <i class="fas fa-building"></i>
+                        </span>
+                        <div>
+                            <div class="ue-info-label">Unit Kerja</div>
+                            <div class="ue-info-val" id="previewUnit">{{ $user->profile?->nama_unit ?: '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ue-preview-note">
+                    <i class="fas fa-pen-to-square"></i> Pratinjau diperbarui otomatis
+                </div>
+            </div>
+
+            {{-- Changelog box --}}
+            <div class="card ue-change-card">
+                <div class="ue-change-title"><i class="fas fa-triangle-exclamation"></i> Perhatian</div>
+                <ul class="ue-change-list">
+                    <li><i class="fas fa-check"></i> Kosongkan password jika tidak ingin menggantinya</li>
+                    <li><i class="fas fa-check"></i> NIK harus unik di seluruh sistem</li>
+                    <li><i class="fas fa-check"></i> Perubahan role berlaku segera setelah disimpan</li>
+                </ul>
+            </div>
+
         </div>
-        <form action="{{ route('users.update', $user->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="name">Nama Lengkap</label>
-                    <input type="text" id="name" name="name" value="{{ $user->name }}" required>
+
+        {{-- ── Kanan: Form ────────────────────────────────── --}}
+        <div class="ue-form-col">
+            <div class="card ue-form-card">
+                <div class="card-header ue-form-header">
+                    <div class="card-title"><i class="fas fa-pen-to-square"></i> Formulir Edit Pengguna</div>
+                    {{-- Edit badge --}}
+                    <span class="ue-edit-badge">
+                        <i class="fas fa-circle" style="font-size:7px;"></i> Mode Edit
+                    </span>
                 </div>
-                <div class="form-group">
-                    <label for="nik">NIK</label>
-                    <input type="text" id="nik" name="nik" value="{{ $user->nik }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="role_id">Role</label>
-                    <select id="role_id" name="role_id" required>
-                        @foreach($roles as $role)
-                        <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>
-                            {{ $role->role_name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password Baru (Opsional)</label>
-                    <input type="password" id="password" name="password">
-                    <small>Kosongkan jika tidak ingin mengubah password.</small>
-                </div>
+
+                <form action="{{ route('users.update', $user->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="card-body ue-body">
+
+                        {{-- Section 01: Identitas --}}
+                        <div class="ue-section-label">
+                            <span class="ue-section-num">01</span>
+                            <span>Identitas Pengguna</span>
+                        </div>
+
+                        <div class="ue-grid-2">
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="name">
+                                    <i class="fas fa-user ue-label-icon"></i>
+                                    Nama Lengkap
+                                    <span class="ue-required">*</span>
+                                </label>
+                                <input
+                                    type="text" id="name" name="name"
+                                    class="ue-input @error('name') ue-input-error @enderror"
+                                    value="{{ old('name', $user->name) }}"
+                                    placeholder="Nama lengkap pengguna"
+                                    oninput="updatePreview()"
+                                    required />
+                                @error('name')
+                                <span class="ue-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="nik">
+                                    <i class="fas fa-id-card ue-label-icon"></i>
+                                    NIK
+                                    <span class="ue-required">*</span>
+                                </label>
+                                <input
+                                    type="text" id="nik" name="nik"
+                                    class="ue-input ue-input-mono @error('nik') ue-input-error @enderror"
+                                    value="{{ old('nik', $user->nik) }}"
+                                    placeholder="Nomor Induk Kependudukan"
+                                    oninput="updatePreview()"
+                                    required />
+                                @error('nik')
+                                <span class="ue-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Section 02: Akun --}}
+                        <div class="ue-section-label">
+                            <span class="ue-section-num">02</span>
+                            <span>Akun &amp; Akses</span>
+                        </div>
+
+                        <div class="ue-grid-2">
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="role_id">
+                                    <i class="fas fa-shield-halved ue-label-icon"></i>
+                                    Role
+                                    <span class="ue-required">*</span>
+                                </label>
+                                <select
+                                    id="role_id" name="role_id"
+                                    class="ue-input ue-select @error('role_id') ue-input-error @enderror"
+                                    onchange="updatePreview()"
+                                    required>
+                                    @foreach($roles as $role)
+                                    <option value="{{ $role->id }}"
+                                        {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>
+                                        {{ $role->role_name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('role_id')
+                                <span class="ue-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="password">
+                                    <i class="fas fa-lock ue-label-icon"></i>
+                                    Password Baru
+                                    <span class="ue-optional">(opsional)</span>
+                                </label>
+                                <div class="ue-pass-wrap">
+                                    <input
+                                        type="password" id="password" name="password"
+                                        class="ue-input ue-input-pass @error('password') ue-input-error @enderror"
+                                        placeholder="Kosongkan jika tidak diubah"
+                                        oninput="checkStrength(this.value)" />
+                                    <button type="button" class="ue-pass-toggle" onclick="togglePass()">
+                                        <i class="fas fa-eye" id="passEye"></i>
+                                    </button>
+                                </div>
+                                <div class="ue-strength-bar">
+                                    <div class="ue-strength-fill" id="strengthFill"></div>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
+                                    <span class="ue-strength-label" id="strengthLabel"></span>
+                                    <small class="ue-pass-hint">Kosongkan jika tidak ingin mengubah password.</small>
+                                </div>
+                                @error('password')
+                                <span class="ue-error-msg"><i class="fas fa-circle-exclamation"></i> {{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Section 03: Profil --}}
+                        <div class="ue-section-label">
+                            <span class="ue-section-num">03</span>
+                            <span>Data Profil</span>
+                        </div>
+
+                        <div class="ue-grid-3">
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="jabatan">
+                                    <i class="fas fa-briefcase ue-label-icon"></i>
+                                    Jabatan
+                                </label>
+                                <input
+                                    type="text" id="jabatan" name="jabatan"
+                                    class="ue-input"
+                                    value="{{ old('jabatan', $user->profile?->jabatan) }}"
+                                    placeholder="Contoh: Direktur"
+                                    oninput="updatePreview()" />
+                            </div>
+
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="nama_jurusan">
+                                    <i class="fas fa-graduation-cap ue-label-icon"></i>
+                                    Nama Jurusan
+                                </label>
+                                <input
+                                    type="text" id="nama_jurusan" name="nama_jurusan"
+                                    class="ue-input"
+                                    value="{{ old('nama_jurusan', $user->profile?->nama_jurusan) }}"
+                                    placeholder="Contoh: Teknik Informatika"
+                                    oninput="updatePreview()" />
+                            </div>
+
+                            <div class="ue-form-group">
+                                <label class="ue-label" for="nama_unit">
+                                    <i class="fas fa-building ue-label-icon"></i>
+                                    Nama Unit
+                                </label>
+                                <input
+                                    type="text" id="nama_unit" name="nama_unit"
+                                    class="ue-input"
+                                    value="{{ old('nama_unit', $user->profile?->nama_unit) }}"
+                                    placeholder="Contoh: Unit SDM"
+                                    oninput="updatePreview()" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {{-- Footer --}}
+                    <div class="card-footer ue-footer">
+                        <a href="{{ route('users.index') }}" class="ue-btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Batal
+                        </a>
+                        <button type="reset" class="ue-btn-reset" onclick="restorePreview()">
+                            <i class="fas fa-rotate-left"></i> Kembalikan
+                        </button>
+                        <button type="submit" class="ue-btn-submit">
+                            <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                <a href="{{ route('users.index') }}" class="btn btn-secondary">Batal</a>
-            </div>
-        </form>
+        </div>
+
     </div>
 </main>
 @endsection

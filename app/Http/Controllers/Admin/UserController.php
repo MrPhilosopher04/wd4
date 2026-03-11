@@ -14,7 +14,7 @@ class UserController
      */
     public function index()
     {
-        $users = User::with('role')->latest()->get();
+        $users = User::with(['role', 'profile'])->latest()->get();
         return view('admin.layout.users', compact('users'));
     }
 
@@ -33,10 +33,16 @@ class UserController
     public function store(Request $request)
     {
         $user = User::create([
-            'nik'=>$request->nik,
-            'name'=>$request->name,
-            'password'=>Hash::make($request->password),
-            'role_id'=>$request->role_id
+            'nik' => $request->nik,
+            'name' => $request->name,
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role_id
+        ]);
+
+        $user->profile()->create([
+            'jabatan' => $request->jabatan,
+            'nama_jurusan' => $request->nama_jurusan,
+            'nama_unit' => $request->nama_unit,
         ]);
 
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
@@ -60,12 +66,21 @@ class UserController
     {
         $user = User::findOrFail($id);
 
-        $data = $request->only('name', 'nik', 'role_id');
+        $userData = $request->only('name', 'nik', 'role_id');
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $userData['password'] = Hash::make($request->password);
         }
 
-        $user->update($data);
+        $user->update($userData);
+
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'jabatan' => $request->jabatan,
+                'nama_jurusan' => $request->nama_jurusan,
+                'nama_unit' => $request->nama_unit,
+            ]
+        );
 
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }

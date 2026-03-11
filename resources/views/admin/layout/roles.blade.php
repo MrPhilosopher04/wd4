@@ -20,41 +20,57 @@
     </div>
     @endif
 
-    <div class="card">
-        <div class="card-header">
+    <div class="card um-card">
+        <div class="card-header um-header">
             <div class="card-title"><i class="fas fa-shield-alt"></i> Daftar Role</div>
-            <a href="{{ route('roles.create') }}" class="btn btn-primary">Tambah Role</a>
+            <a href="{{ route('roles.create') }}" class="um-btn-add">
+                <i class="fas fa-plus"></i> Tambah Role
+            </a>
         </div>
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap um-table-wrap">
+            <table class="um-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nama Role</th>
-                        <th>Tgl. Dibuat</th>
-                        <th style="text-align:center;">Aksi</th>
+                        <th class="um-th um-th-num">#</th>
+                        <th class="um-th">Nama Role</th>
+                        <th class="um-th um-th-aksi">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($roles as $i => $role)
-                    <tr>
-                        <td>{{ $i + 1 }}</td>
-                        <td>{{ $role->role_name }}</td>
-                        <td>{{ $role->created_at?->format('d-m-Y') }}</td>
-                        <td>
-                            <div class="actions">
-                                <a href="{{ route('roles.edit', $role->id) }}" class="btn-action edit"><i class="fas fa-edit"></i></a>
+                    <tr class="um-row">
+                        <td class="um-td um-td-num">
+                            <span class="um-num">{{ $i + 1 }}</span>
+                        </td>
+                        <td class="um-td">
+                            <span class="um-name">{{ $role->role_name ?? '-' }}</span>
+                        </td>
+                        <td class="um-td um-td-aksi">
+                            <div class="actions um-actions">
+                                <a href="{{ route('roles.edit', $role->id) }}" class="btn-action edit um-btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <form action="{{ route('roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus role ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i></button>
+                                    <button type="submit" class="btn-action delete um-btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" style="text-align:center;">Belum ada data role.</td>
+                        <td colspan="4" class="um-empty">
+                            <div class="um-empty-state">
+                                <div class="um-empty-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <p class="um-empty-title">Belum ada data role</p>
+                                <p class="um-empty-sub">Klik tombol <strong>Tambah Role</strong> untuk memulai.</p>
+                            </div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
