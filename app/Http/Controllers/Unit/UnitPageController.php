@@ -77,9 +77,21 @@ class UnitPageController extends Controller
         $unitId = $this->resolveUnitId();
 
         $kegiatan = $this->scopeUnit(KegiatanKerjasama::query(), $unitId)
-            ->with(['mitras', 'jenisKerjasama', 'evaluasis' => function ($q) {
-                $q->where('dinilai_oleh', Auth::id());
-            }])
+            ->with([
+                'mitras',
+                'jenisKerjasama',
+                'jurusans',
+                'unitKerjas',
+                'creator',
+                'tujuans',
+                'pelaksanaans',
+                'hasils',
+                'dokumentasis',
+                'permasalahanSolusis',
+                'evaluasis' => function ($q) {
+                    $q->where('dinilai_oleh', Auth::id());
+                },
+            ])
             ->findOrFail($id);
 
         $existingEval = $kegiatan->evaluasis->first();
@@ -113,10 +125,10 @@ class UnitPageController extends Controller
             'catatan'        => $request->catatan,
         ]);
 
-        // Update status kegiatan menjadi selesai
-        $kegiatan->update(['status' => 'selesai']);
+        // Update status kegiatan menjadi menunggu validasi pimpinan
+        $kegiatan->update(['status' => 'menunggu_validasi']);
 
-        return redirect()->route('unit.evaluasi')->with('success', 'Evaluasi berhasil disimpan.');
+        return redirect()->route('unit.evaluasi')->with('success', 'Evaluasi berhasil dikirim ke Pimpinan untuk divalidasi.');
     }
 
     // ─── Update Evaluasi (PUT) ──────────────────────────────────
@@ -147,7 +159,30 @@ class UnitPageController extends Controller
             'catatan'        => $request->catatan,
         ]);
 
-        return redirect()->route('unit.evaluasi')->with('success', 'Evaluasi berhasil diperbarui.');
+        // Update status kegiatan menjadi menunggu validasi pimpinan
+        $kegiatan->update(['status' => 'menunggu_validasi']);
+
+        return redirect()->route('unit.evaluasi')->with('success', 'Evaluasi berhasil diperbarui dan dikirim ke Pimpinan.');
+    }
+
+    // ─── Submit Evaluasi to Pimpinan (POST) ─────────────────────
+    public function submitEvaluasiToPimpinan($id)
+    {
+        $unitId = $this->resolveUnitId();
+        $kegiatan = $this->scopeUnit(KegiatanKerjasama::query(), $unitId)->findOrFail($id);
+
+        // Pastikan sudah ada evaluasi
+        $hasEval = Evaluasi::where('id_kegiatan', $kegiatan->id)
+            ->where('dinilai_oleh', Auth::id())
+            ->exists();
+
+        if (!$hasEval) {
+            return back()->with('error', 'Tidak bisa mengirim ke Pimpinan. Silakan isi evaluasi terlebih dahulu.');
+        }
+
+        $kegiatan->update(['status' => 'menunggu_validasi']);
+
+        return redirect()->route('unit.evaluasi')->with('success', 'Evaluasi berhasil dikirim ke Pimpinan untuk divalidasi.');
     }
 
     // ─── Laporan Data ────────────────────────────────────────────

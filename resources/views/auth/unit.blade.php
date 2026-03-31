@@ -90,7 +90,7 @@
                 <span>Data Kerjasama</span>
             </a>
 
-            <a class="menu-item {{ request()->routeIs('unit.evaluasi') ? 'active' : '' }}"
+            <a class="menu-item {{ request()->routeIs('unit.evaluasi', 'unit.evaluasi.*') ? 'active' : '' }}"
                 href="{{ route('unit.evaluasi') }}">
                 <div class="menu-icon"><i class="fas fa-check-double"></i></div>
                 <span>Evaluasi Kinerja</span>

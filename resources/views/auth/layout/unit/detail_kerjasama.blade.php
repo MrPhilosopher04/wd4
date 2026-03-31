@@ -537,39 +537,6 @@
         </div>
     </div>
 
-    {{-- ═══ SUBMIT TO PIMPINAN SECTION ═══ --}}
-    @if($kegiatan->status === 'draft')
-    <div style="margin-top: 24px; background: linear-gradient(135deg, rgba(79,70,229,.06), rgba(99,102,241,.04)); border: 1.5px solid rgba(79,70,229,.2); border-radius: 14px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-        <div style="display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 260px;">
-            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #6366f1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <i class="fas fa-paper-plane" style="color: #fff; font-size: 16px;"></i>
-            </div>
-            <div>
-                <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 4px;">Kirim ke Pimpinan</div>
-                <div style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Pastikan semua data kerjasama sudah lengkap dan benar sebelum mengirim ke Pimpinan untuk dievaluasi.</div>
-            </div>
-        </div>
-
-        <form id="submitToPimpinanForm" action="{{ route('unit.kerjasama.submit', $kegiatan->id) }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-
-        <button type="button" onclick="confirmSubmit()" style="padding: 12px 28px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 14px rgba(79,70,229,.3); white-space: nowrap;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(79,70,229,.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(79,70,229,.3)';">
-            <i class="fas fa-paper-plane"></i> Kirim ke Pimpinan
-        </button>
-    </div>
-    @elseif($kegiatan->status === 'menunggu_evaluasi')
-    <div style="margin-top: 24px; background: linear-gradient(135deg, rgba(59,130,246,.06), rgba(96,165,250,.04)); border: 1.5px solid rgba(59,130,246,.2); border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 14px;">
-        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59,130,246,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="fas fa-clock" style="color: #3b82f6; font-size: 16px;"></i>
-        </div>
-        <div>
-            <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 2px;">Menunggu Evaluasi Pimpinan</div>
-            <div style="font-size: 13px; color: var(--text-sub);">Data kerjasama telah dikirim dan sedang menunggu evaluasi dari Pimpinan.</div>
-        </div>
-    </div>
-    @endif
-
     {{-- Back button --}}
     <div style="margin-top: 24px;">
         <a href="{{ route('unit.dkerjasama') }}" class="rfc-btn" style="background: var(--surface); color: var(--text-sub); border: 1px solid var(--border); text-decoration: none; font-size: 13px; font-weight: 700;">
@@ -577,46 +544,3 @@
         </a>
     </div>
 </main>
-
-<script>
-function confirmSubmit() {
-    Swal.fire({
-        title: 'Apakah Anda Sudah Yakin?',
-        html: `
-            <div style="text-align: left; font-size: 14px; color: #64748b; line-height: 1.7; margin-top: 8px;">
-                <p style="margin-bottom: 12px;">Pastikan semua data berikut sudah terisi dengan benar:</p>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Informasi Umum</span></div>
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Tujuan & Sasaran</span></div>
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Pelaksanaan</span></div>
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Hasil & Capaian</span></div>
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Permasalahan & Solusi</span></div>
-                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Dokumentasi</span></div>
-                </div>
-                <p style="margin-top: 14px; color: #ef4444; font-weight: 600; font-size: 13px;">
-                    <i class="fas fa-info-circle"></i> Setelah dikirim, data tidak dapat diedit kembali.
-                </p>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-paper-plane"></i>&nbsp; Kirim ke Pimpinan',
-        cancelButtonText: '<i class="fas fa-times"></i>&nbsp; Batal',
-        confirmButtonColor: '#4f46e5',
-        cancelButtonColor: '#6b7280',
-        reverseButtons: true,
-        focusCancel: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Mengirim...',
-                text: 'Sedang mengirim data ke Pimpinan',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-            document.getElementById('submitToPimpinanForm').submit();
-        }
-    });
-}
-</script>

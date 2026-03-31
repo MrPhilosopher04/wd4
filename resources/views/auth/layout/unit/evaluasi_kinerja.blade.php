@@ -12,6 +12,20 @@
             <strong>{{ auth()->user()->profile?->unitKerja?->nama_unit_pelaksana ?? 'Unit Kerja' }}</strong>.</p>
     </div>
 
+    @if(session('success'))
+        <div style="background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(5,150,105,.08)); border: 1px solid rgba(16,185,129,.3); color: #065f46; padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-check-circle" style="font-size: 16px; color: #10b981;"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="background: linear-gradient(135deg, rgba(239,68,68,.12), rgba(220,38,38,.08)); border: 1px solid rgba(239,68,68,.3); color: #991b1b; padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-exclamation-circle" style="font-size: 16px; color: #ef4444;"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- ═══════════════════════════════════════════════════
          BELUM DIEVALUASI
     ═══════════════════════════════════════════════════ -->

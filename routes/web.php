@@ -148,6 +148,7 @@ Route::middleware(['auth', 'role:unit_kerja'])->group(function () {
     Route::get('/unit/evaluasi/{id}', [App\Http\Controllers\Unit\UnitPageController::class, 'formEvaluasi'])->name('unit.evaluasi.form');
     Route::post('/unit/evaluasi/{id}', [App\Http\Controllers\Unit\UnitPageController::class, 'storeEvaluasi'])->name('unit.evaluasi.store');
     Route::put('/unit/evaluasi/{id}', [App\Http\Controllers\Unit\UnitPageController::class, 'updateEvaluasi'])->name('unit.evaluasi.update');
+    Route::post('/unit/evaluasi/{id}/submit', [App\Http\Controllers\Unit\UnitPageController::class, 'submitEvaluasiToPimpinan'])->name('unit.evaluasi.submit');
 
     // ─── Laporan Data ────────────────────────────────────
     Route::get('/unit/laporan', [App\Http\Controllers\Unit\UnitPageController::class, 'laporan'])->name('unit.laporan');

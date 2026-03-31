@@ -105,6 +105,7 @@ class KegiatanKerjasama extends Model
     {
         return match ($this->status) {
             'menunggu_evaluasi' => 'Menunggu Evaluasi',
+            'menunggu_validasi' => 'Menunggu Validasi Pimpinan',
             'selesai' => 'Selesai',
             default => 'Draft',
         };
@@ -114,6 +115,7 @@ class KegiatanKerjasama extends Model
     {
         return match ($this->status) {
             'menunggu_evaluasi' => 'tag-blue',
+            'menunggu_validasi' => 'tag-purple',
             'selesai' => 'tag-green',
             default => 'tag-orange',
         };
