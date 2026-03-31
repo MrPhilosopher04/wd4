@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\JenisKerjasamaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardJurusanController;
 use App\Http\Controllers\Jurusan\KerjasamaJurusanController;
+use App\Http\Controllers\Unit\KerjasamaUnitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +110,44 @@ Route::middleware(['auth', 'role:jurusan'])->group(function () {
 
 Route::middleware(['auth', 'role:unit_kerja'])->group(function () {
     Route::get('/unit', [DashboardController::class, 'unit'])->name('unit.dashboard');
+
+    // ─── Data Kerjasama ──────────────────────────────────
+    Route::get('/unit/data-kerjasama', [App\Http\Controllers\Unit\UnitPageController::class, 'dkerjasama'])->name('unit.dkerjasama');
+    Route::get('/unit/data-kerjasama/create', [KerjasamaUnitController::class, 'create'])->name('unit.kerjasama.create');
+    Route::post('/unit/data-kerjasama', [KerjasamaUnitController::class, 'store'])->name('unit.kerjasama.store');
+    Route::get('/unit/data-kerjasama/{id}', [KerjasamaUnitController::class, 'show'])->name('unit.kerjasama.show');
+    Route::get('/unit/data-kerjasama/{id}/edit', [KerjasamaUnitController::class, 'edit'])->name('unit.kerjasama.edit');
+    Route::put('/unit/data-kerjasama/{id}', [KerjasamaUnitController::class, 'update'])->name('unit.kerjasama.update');
+    Route::delete('/unit/data-kerjasama/{id}', [KerjasamaUnitController::class, 'destroy'])->name('unit.kerjasama.destroy');
+
+    // ─── Sub-resource: Tujuan ────────────────────────────
+    Route::post('/unit/data-kerjasama/{id}/tujuan', [KerjasamaUnitController::class, 'storeTujuan'])->name('unit.kerjasama.tujuan.store');
+    Route::put('/unit/data-kerjasama/{id}/tujuan/{tujuanId}', [KerjasamaUnitController::class, 'updateTujuan'])->name('unit.kerjasama.tujuan.update');
+
+    // ─── Sub-resource: Pelaksanaan ───────────────────────
+    Route::post('/unit/data-kerjasama/{id}/pelaksanaan', [KerjasamaUnitController::class, 'storePelaksanaan'])->name('unit.kerjasama.pelaksanaan.store');
+    Route::delete('/unit/data-kerjasama/{id}/pelaksanaan/{pelaksanaanId}', [KerjasamaUnitController::class, 'destroyPelaksanaan'])->name('unit.kerjasama.pelaksanaan.destroy');
+
+    // ─── Sub-resource: Hasil ─────────────────────────────
+    Route::post('/unit/data-kerjasama/{id}/hasil', [KerjasamaUnitController::class, 'storeHasil'])->name('unit.kerjasama.hasil.store');
+    Route::delete('/unit/data-kerjasama/{id}/hasil/{hasilId}', [KerjasamaUnitController::class, 'destroyHasil'])->name('unit.kerjasama.hasil.destroy');
+
+    // ─── Sub-resource: Dokumentasi ───────────────────────
+    Route::post('/unit/data-kerjasama/{id}/dokumentasi', [KerjasamaUnitController::class, 'storeDokumentasi'])->name('unit.kerjasama.dokumentasi.store');
+    Route::delete('/unit/data-kerjasama/{id}/dokumentasi/{dokId}', [KerjasamaUnitController::class, 'destroyDokumentasi'])->name('unit.kerjasama.dokumentasi.destroy');
+
+    // ─── Sub-resource: Permasalahan & Solusi ──────────────
+    Route::post('/unit/data-kerjasama/{id}/permasalahan', [KerjasamaUnitController::class, 'storePermasalahan'])->name('unit.kerjasama.permasalahan.store');
+    Route::delete('/unit/data-kerjasama/{id}/permasalahan/{masalahId}', [KerjasamaUnitController::class, 'destroyPermasalahan'])->name('unit.kerjasama.permasalahan.destroy');
+
+    // ─── Submit to Pimpinan ──────────────────────────────
+    Route::post('/unit/data-kerjasama/{id}/submit', [KerjasamaUnitController::class, 'submitToPimpinan'])->name('unit.kerjasama.submit');
+
+    // ─── Evaluasi Kinerja ────────────────────────────────
+    Route::get('/unit/evaluasi', [App\Http\Controllers\Unit\UnitPageController::class, 'evaluasi'])->name('unit.evaluasi');
+
+    // ─── Laporan Data ────────────────────────────────────
+    Route::get('/unit/laporan', [App\Http\Controllers\Unit\UnitPageController::class, 'laporan'])->name('unit.laporan');
 });
 
 /*

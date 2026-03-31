@@ -70,13 +70,31 @@ class DashboardController
             )
             ->first();
 
+        // ── 4. Tren Kerjasama Per Tahun ──────────────────────────
+        $trenPerTahun = $scopeUnit(KegiatanKerjasama::query())
+            ->select(DB::raw('YEAR(created_at) as tahun'), DB::raw('count(*) as total'))
+            ->groupBy('tahun')
+            ->orderBy('tahun')
+            ->get();
+
+        // ── 5. Sebaran Jenis Kerjasama ───────────────────────────
+        $sebaranJenis = DB::table('kegiatan_jenis_kerjasamas')
+            ->join('jenis_kerjasamas', 'kegiatan_jenis_kerjasamas.id_jenis', '=', 'jenis_kerjasamas.id')
+            ->join('kegiatan_units', 'kegiatan_jenis_kerjasamas.id_kegiatan', '=', 'kegiatan_units.id_kegiatan')
+            ->where('kegiatan_units.id_unit', $unitId)
+            ->select('jenis_kerjasamas.nama_kerjasama', DB::raw('count(*) as total'))
+            ->groupBy('jenis_kerjasamas.nama_kerjasama')
+            ->get();
+
         return view('auth.unit', compact(
             'totalKerjasama',
             'menungguEvaluasi',
             'menungguValidasi',
             'selesai',
             'tugasEvaluasi',
-            'avgEvaluasi'
+            'avgEvaluasi',
+            'trenPerTahun',
+            'sebaranJenis'
         ));
     }
 

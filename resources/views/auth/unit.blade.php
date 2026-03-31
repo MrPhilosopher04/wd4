@@ -8,7 +8,9 @@
     <title>Unit — Sistem Informasi Kerjasama Polimdo</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
@@ -26,7 +28,8 @@
                 <button id="hamburger" aria-label="Toggle sidebar">
                     <i class="fa-solid fa-bars-staggered"></i>
                 </button>
-                <div class="brand-icon"><img src="{{ asset('img/logo.png') }}" alt="Handshake" width="35" height="35"></div>
+                <div class="brand-icon"><img src="{{ asset('img/logo.png') }}" alt="Handshake" width="35" height="35">
+                </div>
                 <div class="brand-text">
                     <h1>POLIMDO &amp; DUDIKA</h1>
                     <p>Sistem Informasi Kerjasama</p>
@@ -75,32 +78,28 @@
 
             <div class="menu-section">KERJASAMA UNIT</div>
 
-            <a class="menu-item {{ request()->routeIs('unit.dashboard') ? 'active' : '' }}" href="{{ route('unit.dashboard') }}">
+            <a class="menu-item {{ request()->routeIs('unit.dashboard') ? 'active' : '' }}"
+                href="{{ route('unit.dashboard') }}">
                 <div class="menu-icon"><i class="fas fa-home"></i></div>
                 <span>Dashboard</span>
             </a>
 
-            <a class="menu-item" href="#" data-page="data_kerjasama">
+            <a class="menu-item {{ request()->routeIs('unit.dkerjasama', 'unit.kerjasama.*') ? 'active' : '' }}"
+                href="{{ route('unit.dkerjasama') }}">
                 <div class="menu-icon"><i class="fas fa-folder"></i></div>
                 <span>Data Kerjasama</span>
             </a>
 
-            <div class="menu-section">PENILAIAN</div>
-
-            <a class="menu-item" href="#" data-page="evaluasi_kinerja">
+            <a class="menu-item {{ request()->routeIs('unit.evaluasi') ? 'active' : '' }}"
+                href="{{ route('unit.evaluasi') }}">
                 <div class="menu-icon"><i class="fas fa-check-double"></i></div>
                 <span>Evaluasi Kinerja</span>
             </a>
 
-            <div class="menu-section">SYSTEM</div>
-
-            <a class="menu-item" href="#" data-page="laporan">
+            <a class="menu-item {{ request()->routeIs('unit.laporan') ? 'active' : '' }}"
+                href="{{ route('unit.laporan') }}">
                 <div class="menu-icon"><i class="fas fa-file-signature"></i></div>
                 <span>Laporan Data</span>
-            </a>
-            <a class="menu-item" href="#" data-page="statistik">
-                <div class="menu-icon"><i class="fas fa-chart-simple"></i></div>
-                <span>Statistik Data</span>
             </a>
         </aside>
 
@@ -112,7 +111,21 @@
         <!-- Main Content -->
         @yield('content')
         @if(!View::hasSection('content'))
-            @include('auth.layout.unit.dashboard')
+            @if(request()->routeIs('unit.kerjasama.create'))
+                @include('auth.layout.unit.create_kerjasama')
+            @elseif(request()->routeIs('unit.kerjasama.edit'))
+                @include('auth.layout.unit.edit_kerjasama')
+            @elseif(request()->routeIs('unit.kerjasama.show'))
+                @include('auth.layout.unit.detail_kerjasama')
+            @elseif(request()->routeIs('unit.dkerjasama'))
+                @include('auth.layout.unit.dkerjasama')
+            @elseif(request()->routeIs('unit.evaluasi'))
+                @include('auth.layout.unit.evaluasi_kinerja')
+            @elseif(request()->routeIs('unit.laporan'))
+                @include('auth.layout.unit.laporan')
+            @else
+                @include('auth.layout.unit.dashboard')
+            @endif
         @endif
 
         <div id="sidebarOverlay"></div>
