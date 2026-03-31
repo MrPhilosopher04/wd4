@@ -28,6 +28,8 @@ class KegiatanKerjasama extends Model
         'tanggal_mou' => 'date',
     ];
 
+    protected $appends = ['status_label', 'status_class'];
+
     // ─── Relationships ───────────────────────────────────
 
     public function jenisKerjasama()

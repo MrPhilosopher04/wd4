@@ -200,6 +200,56 @@ class UnitPageController extends Controller
         return view('auth.unit', compact('jenisKerjasama', 'kerjasamaUnit'));
     }
 
+    public function laporanPreview(Request $request)
+    {
+        $data = $this->buildLaporanQuery($request)
+            ->with(['jenisKerjasama', 'mitras', 'evaluasis'])
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function laporanPdf(Request $request)
+    {
+        $data = $this->buildLaporanQuery($request)
+            ->with(['jenisKerjasama', 'mitras', 'tujuans', 'pelaksanaans', 'hasils', 'evaluasis'])
+            ->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('auth.layout.unit.laporan_pdf', compact('data'));
+        return $pdf->download('laporan_kerjasama_unit.pdf');
+    }
+
+    public function laporanExcel(Request $request)
+    {
+        $data = $this->buildLaporanQuery($request)
+            ->with(['jenisKerjasama', 'mitras', 'tujuans', 'pelaksanaans', 'hasils', 'evaluasis'])
+            ->get();
+
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\LaporanKerjasamaExport($data), 'laporan_kerjasama_unit.xlsx');
+    }
+
+    private function buildLaporanQuery(Request $request)
+    {
+        $unitId = $this->resolveUnitId();
+        $query = $this->scopeUnit(KegiatanKerjasama::query(), $unitId);
+
+        if ($request->filled('tanggal_awal')) {
+            $query->where('periode_mulai', '>=', $request->tanggal_awal);
+        }
+        if ($request->filled('tanggal_akhir')) {
+            $query->where('periode_mulai', '<=', $request->tanggal_akhir);
+        }
+        if ($request->filled('id_jenis') && $request->id_jenis != 'all') {
+            $query->whereHas('jenisKerjasama', fn($q) => $q->where('jenis_kerjasamas.id', $request->id_jenis));
+        }
+        if ($request->filled('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        }
+
+        return $query;
+    }
+
+
     // ─── Statistik Data ──────────────────────────────────────────
     public function statistik()
     {

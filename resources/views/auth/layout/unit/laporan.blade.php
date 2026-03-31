@@ -6,16 +6,14 @@
             <span class="current">Laporan Data</span>
         </div>
         <h2>Laporan Data Kerjasama</h2>
-        <p>Saring dan unduh dokumen laporan kerjasama jurusan secara kolektif.</p>
+        <p>Saring dan unduh dokumen laporan kerjasama unit kerja secara kolektif.</p>
     </div>
 
-    <!-- Filter Section (Redesigned) -->
+    <!-- Filter Section -->
     <div class="report-filter-container" x-data="{ showFilters: true }">
         <div class="rfc-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" @click="showFilters = !showFilters">
             <div class="rfc-title-area">
-                <div class="rfc-icon">
-                    <i class="fas fa-sliders-h"></i>
-                </div>
+                <div class="rfc-icon"><i class="fas fa-sliders-h"></i></div>
                 <div class="rfc-text">
                     <h3>Filter Laporan</h3>
                     <p>Saring data kerjasama secara rinci sebelum ditampilkan atau diunduh.</p>
@@ -25,13 +23,13 @@
                 <i class="fas fa-chevron-down"></i>
             </div>
         </div>
-        
+
         <div class="rfc-body" x-show="showFilters" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-4">
-            <form id="filterForm" class="rfc-form" 
-                  data-preview-url="{{ route('jurusan.laporan.preview') }}"
-                  data-pdf-url="{{ route('jurusan.laporan.pdf') }}"
-                  data-excel-url="{{ route('jurusan.laporan.excel') }}">
-                
+            <form id="filterForm" class="rfc-form"
+                  data-preview-url="{{ route('unit.laporan.preview') }}"
+                  data-pdf-url="{{ route('unit.laporan.pdf') }}"
+                  data-excel-url="{{ route('unit.laporan.excel') }}">
+
                 <div class="rfc-grid">
                     <!-- Column 1: From -->
                     <div class="rfc-group" x-data="datepicker('')">
@@ -50,22 +48,16 @@
                                     </div>
                                 </div>
                                 <div class="adp-grid">
-                                    <template x-for="day in dayNames">
-                                        <div class="adp-day-name" x-text="day"></div>
-                                    </template>
-                                    <template x-for="blankday in blanks">
-                                        <div class="adp-day empty"></div>
-                                    </template>
+                                    <template x-for="day in dayNames"><div class="adp-day-name" x-text="day"></div></template>
+                                    <template x-for="blankday in blanks"><div class="adp-day empty"></div></template>
                                     <template x-for="date in days">
-                                        <div class="adp-day" 
-                                             :class="{'today': isToday(date), 'selected': isSelected(date)}"
-                                             @click="selectDate(date)" x-text="date"></div>
+                                        <div class="adp-day" :class="{'today': isToday(date), 'selected': isSelected(date)}" @click="selectDate(date)" x-text="date"></div>
                                     </template>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Column 2: To -->
                     <div class="rfc-group" x-data="datepicker('')">
                         <label>To</label>
@@ -83,16 +75,10 @@
                                     </div>
                                 </div>
                                 <div class="adp-grid">
-                                    <template x-for="day in dayNames">
-                                        <div class="adp-day-name" x-text="day"></div>
-                                    </template>
-                                    <template x-for="blankday in blanks">
-                                        <div class="adp-day empty"></div>
-                                    </template>
+                                    <template x-for="day in dayNames"><div class="adp-day-name" x-text="day"></div></template>
+                                    <template x-for="blankday in blanks"><div class="adp-day empty"></div></template>
                                     <template x-for="date in days">
-                                        <div class="adp-day" 
-                                             :class="{'today': isToday(date), 'selected': isSelected(date)}"
-                                             @click="selectDate(date)" x-text="date"></div>
+                                        <div class="adp-day" :class="{'today': isToday(date), 'selected': isSelected(date)}" @click="selectDate(date)" x-text="date"></div>
                                     </template>
                                 </div>
                             </div>
@@ -100,9 +86,9 @@
                     </div>
 
                     <!-- Column 3: Jenis Kerjasama -->
-                    <div class="rfc-group" x-data="{ 
-                        open: false, 
-                        selected: 'all', 
+                    <div class="rfc-group" x-data="{
+                        open: false,
+                        selected: 'all',
                         selectedLabel: 'Semua Jenis',
                         items: [
                             { id: 'all', label: 'Semua Jenis' },
@@ -123,28 +109,28 @@
                             </div>
                             <div class="ad-menu" x-show="open" x-transition>
                                 <template x-for="item in items">
-                                    <div class="ad-item" :class="{'selected': selected == item.id}" 
+                                    <div class="ad-item" :class="{'selected': selected == item.id}"
                                          @click="selected = item.id; selectedLabel = item.label; open = false"
                                          x-text="item.label"></div>
                                 </template>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Column 4: Status Evaluasi -->
-                    <div class="rfc-group" x-data="{ 
-                        open: false, 
-                        selected: 'all', 
+
+                    <!-- Column 4: Status -->
+                    <div class="rfc-group" x-data="{
+                        open: false,
+                        selected: 'all',
                         selectedLabel: 'Semua Status',
                         items: [
                             { id: 'all', label: 'Semua Status' },
                             { id: 'draft', label: 'Draft' },
                             { id: 'menunggu_evaluasi', label: 'Menunggu Evaluasi' },
-                            <!-- { id: 'revisi', label: 'Revisi' }, -->
-                            { id: 'selesai', label: 'Selesai/Layak' }
+                            { id: 'menunggu_validasi', label: 'Menunggu Validasi Pimpinan' },
+                            { id: 'selesai', label: 'Selesai' }
                         ]
                     }">
-                        <label>Status Evaluasi</label>
+                        <label>Status</label>
                         <input type="hidden" name="status" :value="selected">
                         <div class="alpine-dropdown" @click.outside="open = false">
                             <div class="ad-trigger" :class="{'active': open}" @click="open = !open">
@@ -156,7 +142,7 @@
                             </div>
                             <div class="ad-menu" x-show="open" x-transition>
                                 <template x-for="item in items">
-                                    <div class="ad-item" :class="{'selected': selected == item.id}" 
+                                    <div class="ad-item" :class="{'selected': selected == item.id}"
                                          @click="selected = item.id; selectedLabel = item.label; open = false"
                                          x-text="item.label"></div>
                                 </template>
@@ -186,6 +172,7 @@
             <div class="card-title" style="font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-eye" style="color: var(--accent);"></i>
                 <span>Preview Data</span>
+                <span id="previewCount" style="display:none; font-size: 12px; font-weight: 600; color: var(--accent); background: rgba(79,70,229,.1); padding: 3px 10px; border-radius: 20px;"></span>
             </div>
         </div>
         <div class="card-body" style="padding: 0;">
@@ -202,8 +189,7 @@
                         </tr>
                     </thead>
                     <tbody id="previewBody">
-                        <!-- State Empty (Disembunyikan, untuk dikendalikan via JS) -->
-                        <tr id="emptyStateRow" style="display: none;">
+                        <tr id="emptyStateRow">
                             <td colspan="6" class="um-empty">
                                 <div class="um-empty-state" style="padding: 30px 0;">
                                     <div class="um-empty-icon">
@@ -220,3 +206,87 @@
         </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('filterForm');
+    const previewBody = document.getElementById('previewBody');
+    const emptyRow = document.getElementById('emptyStateRow');
+    const previewCount = document.getElementById('previewCount');
+
+    function getFormParams() {
+        const fd = new FormData(form);
+        const params = new URLSearchParams();
+        fd.forEach(function (val, key) { if (val) params.append(key, val); });
+        return params.toString();
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        var d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    // Tampilkan preview
+    document.getElementById('btnTampilkan').addEventListener('click', function () {
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+
+        var url = form.dataset.previewUrl + '?' + getFormParams();
+
+        fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                previewBody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    previewBody.innerHTML = '<tr><td colspan="6" class="um-empty"><div class="um-empty-state" style="padding:30px 0;"><div class="um-empty-icon"><i class="fas fa-inbox" style="font-size:28px; opacity:0.3; color:var(--text-sub);"></i></div><p class="um-empty-title">Tidak ada data ditemukan</p><p class="um-empty-sub">Coba ubah filter untuk menampilkan data lain.</p></div></td></tr>';
+                    previewCount.style.display = 'none';
+                } else {
+                    previewCount.textContent = data.length + ' data';
+                    previewCount.style.display = 'inline-block';
+
+                    data.forEach(function (item, idx) {
+                        var jenis = (item.jenis_kerjasama || []).map(function (j) { return j.nama_kerjasama; }).join(', ') || '-';
+                        var mitra = (item.mitras || []).map(function (m) { return m.nama_mitra; }).join(', ') || '-';
+                        var periode = formatDate(item.periode_mulai) + ' — ' + formatDate(item.periode_selesai);
+                        var sLabel = item.status_label || item.status || '-';
+                        var sClass = item.status_class || 'tag-orange';
+
+                        var tr = document.createElement('tr');
+                        tr.className = 'um-row';
+                        tr.innerHTML =
+                            '<td class="um-td um-td-num"><span class="um-num">' + String(idx + 1).padStart(3, '0') + '</span></td>' +
+                            '<td class="um-td"><span class="um-name">' + (item.nama_kegiatan || '-') + '</span></td>' +
+                            '<td class="um-td"><span class="tag tag-purple" style="font-size:11px;">' + jenis + '</span></td>' +
+                            '<td class="um-td" style="font-size:12px;">' + mitra + '</td>' +
+                            '<td class="um-td" style="font-size:12px; color:var(--text-sub);">' + periode + '</td>' +
+                            '<td class="um-td"><span class="tag ' + sClass + '" style="font-size:11px;"><i class="fas fa-circle" style="font-size:6px;"></i> ' + sLabel + '</span></td>';
+                        previewBody.appendChild(tr);
+                    });
+                }
+            })
+            .catch(function (err) {
+                console.error(err);
+                previewBody.innerHTML = '<tr><td colspan="6" class="um-empty"><div class="um-empty-state" style="padding:30px 0;"><p class="um-empty-title" style="color:#ef4444;">Gagal memuat data</p><p class="um-empty-sub">Terjadi kesalahan. Silakan coba lagi.</p></div></td></tr>';
+            })
+            .finally(function () {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> Tampilkan';
+            });
+    });
+
+    // Cetak PDF
+    document.getElementById('btnCetakPdf').addEventListener('click', function () {
+        window.open(form.dataset.pdfUrl + '?' + getFormParams(), '_blank');
+    });
+
+    // Export Excel
+    document.getElementById('btnExportExcel').addEventListener('click', function () {
+        window.open(form.dataset.excelUrl + '?' + getFormParams(), '_blank');
+    });
+});
+</script>
