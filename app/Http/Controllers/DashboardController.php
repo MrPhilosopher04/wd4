@@ -14,7 +14,79 @@ class DashboardController
 {
     public function pimpinan()
     {
-        return view('auth.pimpinan');
+        $tahunIni = now()->year;
+
+        // ── 1. WIDGET KARTU STATISTIK ─────────────────────────────
+
+        // Total Kerja Sama Tahun Ini (status layak/selesai atau semua valid)
+        $totalKerjasamaTahunIni = KegiatanKerjasama::whereYear('created_at', $tahunIni)->count();
+
+        // Menunggu Evaluasi Pimpinan (dari Jurusan)
+        $menungguEvaluasi = KegiatanKerjasama::where('status', 'menunggu_evaluasi')->count();
+
+        // Menunggu Validasi Akhir (dari Unit Kerja)
+        $menungguValidasi = KegiatanKerjasama::where('status', 'menunggu_validasi')->count();
+
+        // Kerjasama Internasional vs Nasional
+        $internasional = KegiatanKerjasama::whereYear('created_at', $tahunIni)
+            ->whereHas('mitras', fn($q) => $q->where('kategori', 'internasional'))
+            ->count();
+        $nasional = KegiatanKerjasama::whereYear('created_at', $tahunIni)
+            ->whereHas('mitras', fn($q) => $q->where('kategori', 'nasional'))
+            ->count();
+
+        // ── 2. VISUALISASI GRAFIK ─────────────────────────────────
+
+        // A. Tren Kerja Sama Per Bulan (tahun berjalan)
+        $trenPerBulan = KegiatanKerjasama::whereYear('created_at', $tahunIni)
+            ->select(DB::raw('MONTH(created_at) as bulan'), DB::raw('COUNT(*) as total'))
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get();
+
+        // B. Distribusi Sebaran Jenis Kerjasama (Donut)
+        $sebaranJenis = DB::table('kegiatan_jenis_kerjasamas')
+            ->join('jenis_kerjasamas', 'kegiatan_jenis_kerjasamas.id_jenis', '=', 'jenis_kerjasamas.id')
+            ->select('jenis_kerjasamas.nama_kerjasama', DB::raw('COUNT(*) as total'))
+            ->groupBy('jenis_kerjasamas.nama_kerjasama')
+            ->get();
+
+        // C. Kinerja Jurusan (Horizontal Bar)
+        $kinerjaJurusan = DB::table('kegiatan_jurusans')
+            ->join('jurusans', 'kegiatan_jurusans.id_jurusan', '=', 'jurusans.id')
+            ->select('jurusans.nama_jurusan', DB::raw('COUNT(*) as total'))
+            ->groupBy('jurusans.nama_jurusan')
+            ->orderByDesc('total')
+            ->get();
+
+        // C2. Kinerja Unit Kerja (Horizontal Bar)
+        $kinerjaUnit = DB::table('kegiatan_units')
+            ->join('unit_kerjas', 'kegiatan_units.id_unit', '=', 'unit_kerjas.id')
+            ->select('unit_kerjas.nama_unit_pelaksana', DB::raw('COUNT(*) as total'))
+            ->groupBy('unit_kerjas.nama_unit_pelaksana')
+            ->orderByDesc('total')
+            ->get();
+
+        // ── 3. TABEL AKSI CEPAT ──────────────────────────────────
+
+        $dokumenMenunggu = KegiatanKerjasama::with(['jurusans', 'unitKerjas'])
+            ->whereIn('status', ['menunggu_evaluasi', 'menunggu_validasi'])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('auth.pimpinan', compact(
+            'totalKerjasamaTahunIni',
+            'menungguEvaluasi',
+            'menungguValidasi',
+            'internasional',
+            'nasional',
+            'trenPerBulan',
+            'sebaranJenis',
+            'kinerjaJurusan',
+            'kinerjaUnit',
+            'dokumenMenunggu'
+        ));
     }
 
     public function unit()
