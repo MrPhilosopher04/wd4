@@ -8,7 +8,9 @@
     <title>Pimpinan — Sistem Informasi Kerjasama Polimdo</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
@@ -24,7 +26,8 @@
                 <button id="hamburger" aria-label="Toggle sidebar">
                     <i class="fa-solid fa-bars-staggered"></i>
                 </button>
-                <div class="brand-icon"><img src="{{ asset('img/logo.png') }}" alt="Handshake" width="35" height="35"></div>
+                <div class="brand-icon"><img src="{{ asset('img/logo.png') }}" alt="Handshake" width="35" height="35">
+                </div>
                 <div class="brand-text">
                     <h1>POLIMDO &amp; DUDIKA</h1>
                     <p>Sistem Informasi Kerjasama</p>
@@ -73,23 +76,24 @@
 
             <div class="menu-section">MONITORING</div>
 
-            <a class="menu-item {{ request()->routeIs('pimpinan.dashboard') ? 'active' : '' }}" href="{{ route('pimpinan.dashboard') }}">
+            <a class="menu-item {{ request()->routeIs('pimpinan.dashboard') ? 'active' : '' }}"
+                href="{{ route('pimpinan.dashboard') }}">
                 <div class="menu-icon"><i class="fas fa-tachometer-alt"></i></div>
-                <span>Dashboard</span>
+                <span>Dashboard Eksekutif</span>
             </a>
 
             <a class="menu-item" href="#" data-page="data_kerjasama">
                 <div class="menu-icon"><i class="fas fa-folder-open"></i></div>
-                <span>Data Kerjasama</span>
+                <span>Monitoring Data</span>
             </a>
 
             <a class="menu-item" href="#" data-page="laporan">
                 <div class="menu-icon"><i class="fas fa-file-signature"></i></div>
-                <span>Laporan Data</span>
+                <span>Evaluasi & Validasi</span>
             </a>
             <a class="menu-item" href="#" data-page="statistik">
                 <div class="menu-icon"><i class="fas fa-chart-simple"></i></div>
-                <span>Statistik Data</span>
+                <span>Laporan Global</span>
             </a>
         </aside>
 
