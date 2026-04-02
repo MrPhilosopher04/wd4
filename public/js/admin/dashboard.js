@@ -84,11 +84,61 @@ function initDashboard() {
     /* ─ Logout confirm ─ */
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.onclick = () => {
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                // Biarkan form logout submit jika ada, atau redirect
+        logoutBtn.onclick = (e) => {
+            e.preventDefault();
+            const form = logoutBtn.closest('form');
+            if (!form) return;
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Apakah anda ingin keluar?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#7c3aed',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Ya, Keluar!',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else {
+                if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                    form.submit();
+                }
             }
         };
+    }
+
+    /* ─ Global Delete Confirm with SweetAlert ─ */
+    if (typeof Swal !== 'undefined') {
+        document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
+            const originalOnSubmit = form.getAttribute('onsubmit');
+            if (originalOnSubmit && originalOnSubmit.includes('confirm')) {
+                const match = originalOnSubmit.match(/confirm\(['"](.+)['"]\)/);
+                const message = match ? match[1] : 'Yakin ingin melanjutkan?';
+
+                form.removeAttribute('onsubmit');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#7c3aed',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        });
     }
 
     /* Live preview (untuk halaman create/edit user) */

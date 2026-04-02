@@ -21,6 +21,9 @@ function initDashboard() {
 
         dmBtn.onclick = () => {
             applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+            if (window.Swal && Swal.isVisible()) {
+                Swal.close();
+            }
         };
     }
 
@@ -147,12 +150,56 @@ function initDashboard() {
     /* ─ Logout confirm ─ */
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.onclick = () => {
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                // Biarkan form logout submit jika ada, atau redirect
-            }
+        logoutBtn.onclick = (e) => {
+            e.preventDefault();
+            const form = logoutBtn.closest('form');
+            if (!form) return;
+
+            Swal.fire({
+                title: 'Apakah anda ingin keluar?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#7c3aed',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Keluar!',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         };
     }
+
+    /* ─ Global Delete Confirm with SweetAlert ─ */
+    document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
+        const originalOnSubmit = form.getAttribute('onsubmit');
+        // Check if it's a delete confirmation
+        if (originalOnSubmit && originalOnSubmit.includes('confirm')) {
+            // Get the message from confirm('...')
+            const match = originalOnSubmit.match(/confirm\(['"](.+)['"]\)/);
+            const message = match ? match[1] : 'Yakin ingin melanjutkan?';
+
+            form.removeAttribute('onsubmit');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#7c3aed',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Ya, Lanjutkan!',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+    });
 
     /* ─ Dashboard Charts ─ */
     initCharts();

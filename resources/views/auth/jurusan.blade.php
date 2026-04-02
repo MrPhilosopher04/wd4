@@ -111,7 +111,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="/logout" style="display: inline;">
+                <form id="logout-form" method="POST" action="/logout" style="display: inline;">
                     @csrf
                     <button type="submit" class="icon-btn danger" id="logoutBtn" title="Logout">
                         <i class="fas fa-sign-out-alt"></i>
