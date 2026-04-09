@@ -187,7 +187,10 @@
                 <div class="card-title"><i class="fas fa-chart-line"></i> Tren Kerjasama Per Tahun</div>
             </div>
             <div class="card-body" style="height:300px; padding:20px;">
-                <canvas id="trenChart"></canvas>
+                <canvas id="trenChart" 
+                    data-labels="{{ ($trenPerTahun ?? collect())->pluck('tahun')->toJson() }}"
+                    data-values="{{ ($trenPerTahun ?? collect())->pluck('total')->toJson() }}">
+                </canvas>
             </div>
         </div>
 
@@ -197,7 +200,11 @@
                 <div class="card-title"><i class="fas fa-chart-pie"></i> Sebaran Jenis Kerjasama</div>
             </div>
             <div class="card-body" style="height:300px; padding:20px;">
-                <canvas id="jenisChart"></canvas>
+                <canvas id="jenisChart"
+                    data-labels="{{ ($sebaranJenis ?? collect())->pluck('nama_kerjasama')->toJson() }}"
+                    data-values="{{ ($sebaranJenis ?? collect())->pluck('total')->toJson() }}"
+                    data-count="{{ ($sebaranJenis ?? collect())->count() }}">
+                </canvas>
             </div>
         </div>
     </div>
@@ -216,7 +223,14 @@
                 </span>
             </div>
             <div class="card-body" style="height:300px; padding:20px;">
-                <canvas id="evaluasiChart"></canvas>
+                <canvas id="evaluasiChart"
+                    data-values="{{ json_encode([
+                        $avgEvaluasi->avg_kualitas ?? 0,
+                        $avgEvaluasi->avg_keterlibatan ?? 0,
+                        $avgEvaluasi->avg_efisiensi ?? 0,
+                        $avgEvaluasi->avg_kepuasan ?? 0
+                    ]) }}">
+                </canvas>
             </div>
         </div>
 
@@ -271,7 +285,9 @@
 
 {{-- ── Chart.js scripts ──────────────────────────────────────── --}}
 <script>
+    /* global Chart */
     document.addEventListener('DOMContentLoaded', function () {
+        // Theme config
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
         const textColor = isDark ? '#8b92a8' : '#6b7280';
@@ -279,13 +295,16 @@
         // ── 1. Tren Per Tahun (Line Chart) ──────────────────────
         const trenCtx = document.getElementById('trenChart');
         if (trenCtx) {
+            const labels = JSON.parse(trenCtx.dataset.labels || '[]');
+            const values = JSON.parse(trenCtx.dataset.values || '[]');
+
             new Chart(trenCtx, {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode(($trenPerTahun ?? collect())->pluck('tahun')) !!},
+                    labels: labels,
                     datasets: [{
                         label: 'Jumlah Kerjasama',
-                        data: {!! json_encode(($trenPerTahun ?? collect())->pluck('total')) !!},
+                        data: values,
                         borderColor: '#4f46e5',
                         backgroundColor: 'rgba(79,70,229,0.1)',
                         fill: true,
@@ -319,14 +338,18 @@
         // ── 2. Sebaran Jenis (Doughnut Chart) ───────────────────
         const jenisCtx = document.getElementById('jenisChart');
         if (jenisCtx) {
+            const labels = JSON.parse(jenisCtx.dataset.labels || '[]');
+            const values = JSON.parse(jenisCtx.dataset.values || '[]');
+            const count = parseInt(jenisCtx.dataset.count || '0');
             const jenisColors = ['#4f46e5','#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6'];
+
             new Chart(jenisCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: {!! json_encode(($sebaranJenis ?? collect())->pluck('nama_kerjasama')) !!},
+                    labels: labels,
                     datasets: [{
-                        data: {!! json_encode(($sebaranJenis ?? collect())->pluck('total')) !!},
-                        backgroundColor: jenisColors.slice(0, {!! ($sebaranJenis ?? collect())->count() !!}),
+                        data: values,
+                        backgroundColor: jenisColors.slice(0, count),
                         borderWidth: 2,
                         borderColor: isDark ? '#1a1d2e' : '#ffffff'
                     }]
@@ -348,18 +371,15 @@
         // ── 3. Evaluasi Bar Chart ────────────────────────────────
         const evalCtx = document.getElementById('evaluasiChart');
         if (evalCtx) {
+            const values = JSON.parse(evalCtx.dataset.values || '[0,0,0,0]');
+
             new Chart(evalCtx, {
                 type: 'bar',
                 data: {
                     labels: ['Kualitas', 'Keterlibatan', 'Efisiensi', 'Kepuasan'],
                     datasets: [{
                         label: 'Rata-rata Skor',
-                        data: [
-                            {{ $avgEvaluasi->avg_kualitas ?? 0 }},
-                            {{ $avgEvaluasi->avg_keterlibatan ?? 0 }},
-                            {{ $avgEvaluasi->avg_efisiensi ?? 0 }},
-                            {{ $avgEvaluasi->avg_kepuasan ?? 0 }}
-                        ],
+                        data: values,
                         backgroundColor: [
                             'rgba(79,70,229,0.75)',
                             'rgba(14,165,233,0.75)',
