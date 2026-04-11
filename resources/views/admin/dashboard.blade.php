@@ -35,10 +35,13 @@
             </div>
 
             <div class="nav-actions">
-                <!-- Search hint (desktop) -->
-                <div class="search-bar" style="width:220px; display:none; align-items:center;" id="navSearch">
+                <!-- Search (desktop) -->
+                <div class="search-bar" id="navSearch" style="display:none;">
                     <i class="fas fa-search"></i>
-                    <span>Cari data...</span>
+                    <input type="text" id="navSearchInput" placeholder="Cari data..." class="search-input" autocomplete="off" />
+                    <button type="button" id="navSearchClear" class="search-clear-btn" style="display:none;" title="Bersihkan pencarian">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
 
                 <button class="icon-btn" id="darkModeBtn" title="Toggle dark mode">
