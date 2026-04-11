@@ -74,6 +74,9 @@
                 <div class="search-bar" id="navSearch" style="display:none;">
                     <i class="fas fa-search"></i>
                     <input type="text" id="navSearchInput" placeholder="Cari data..." class="search-input" autocomplete="off" />
+                    <button type="button" id="navSearchClear" class="search-clear-btn" style="display:none;" title="Bersihkan pencarian">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
 
                 <button class="icon-btn" id="darkModeBtn" title="Toggle dark mode">

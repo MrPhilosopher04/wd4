@@ -14,12 +14,6 @@
             <div class="card-title">
                 <i class="fas fa-desktop"></i> Daftar Kerjasama Global
             </div>
-            <div class="header-actions" style="display: flex; gap: 10px;">
-                <div class="search-bar" style="width: 250px;">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="monitoringSearch" placeholder="Cari kegiatan/pengusul..." class="search-input">
-                </div>
-            </div>
         </div>
 
         <div class="table-wrap">
@@ -85,14 +79,3 @@
         </div>
     </div>
 </main>
-
-<script>
-    document.getElementById('monitoringSearch').addEventListener('input', function(e) {
-        const q = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#monitoringTable tbody tr.um-row');
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(q) ? '' : 'none';
-        });
-    });
-</script>

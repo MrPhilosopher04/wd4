@@ -44,7 +44,7 @@
                     </thead>
                     <tbody>
                         @forelse($laporanJurusan as $index => $kegiatan)
-                            <tr>
+                            <tr class="um-row">
                                 <td>{{ $index + 1 }}</td>
                                 <td><strong>{{ $kegiatan->jurusans->first()->nama_jurusan ?? '-' }}</strong></td>
                                 <td>{{ $kegiatan->nama_kegiatan }}</td>
@@ -97,7 +97,7 @@
                     </thead>
                     <tbody>
                         @forelse($laporanUnit as $index => $kegiatan)
-                            <tr>
+                            <tr class="um-row">
                                 <td>{{ $index + 1 }}</td>
                                 <td><strong>{{ $kegiatan->unitKerjas->first()->nama_unit_pelaksana ?? '-' }}</strong></td>
                                 <td>{{ $kegiatan->nama_kegiatan }}</td>

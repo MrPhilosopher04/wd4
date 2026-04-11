@@ -86,13 +86,45 @@ function initDashboard() {
     }
 
     /* ─ Global search: filter tabel Data Kerjasama & Laporan ─ */
+    const searchClear = document.getElementById('navSearchClear');
     if (searchInput) {
+        let searchTimeout;
+        
+        function highlightText(element, query) {
+            if (!query) return;
+
+            // Recursive function to highlight text nodes
+            function innerHighlight(node) {
+                if (node.nodeType === 3) { // Text node
+                    const text = node.nodeValue;
+                    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    
+                    if (text.match(regex)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = text.replace(regex, '<mark class="search-highlight">$1</mark>');
+                        node.parentNode.replaceChild(span, node);
+                    }
+                } else if (node.nodeType === 1 && node.childNodes && !/(script|style)/i.test(node.tagName) && node.className !== 'search-highlight') {
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        innerHighlight(node.childNodes[i]);
+                    }
+                }
+            }
+            innerHighlight(element);
+        }
+
         function filterTableBySearch() {
             const q = (searchInput.value || '').trim().toLowerCase();
-            const tables = [
-                document.querySelector('#mainContent .um-table tbody'),  // Data Kerjasama
-                document.getElementById('previewBody')                   // Laporan preview
-            ].filter(Boolean);
+            
+            // Toggle clear button visibility
+            if (searchClear) {
+                searchClear.style.display = q ? 'flex' : 'none';
+            }
+
+            // Select all relevant table bodies
+            const tables = Array.from(document.querySelectorAll('#mainContent .um-table tbody'));
+            const previewBody = document.getElementById('previewBody');
+            if (previewBody) tables.push(previewBody);
 
             tables.forEach(tbody => {
                 if (!tbody) return;
@@ -101,10 +133,31 @@ function initDashboard() {
                 let visibleCount = 0;
 
                 rows.forEach(row => {
-                    const text = row.textContent || '';
-                    const match = !q || text.toLowerCase().includes(q);
-                    row.style.display = match ? '' : 'none';
-                    if (match) visibleCount++;
+                    // Save original HTML if not already saved
+                    if (!row.hasAttribute('data-original-html')) {
+                        row.setAttribute('data-original-html', row.innerHTML);
+                    }
+                    
+                    // Restore original HTML before search and highlight
+                    row.innerHTML = row.getAttribute('data-original-html');
+                    
+                    const cells = row.querySelectorAll('td');
+                    let rowMatch = false;
+                    
+                    cells.forEach(cell => {
+                        const cellText = cell.textContent || '';
+                        if (!q || cellText.toLowerCase().includes(q)) {
+                            rowMatch = true;
+                        }
+                    });
+
+                    row.style.display = rowMatch ? '' : 'none';
+                    if (rowMatch) {
+                        visibleCount++;
+                        if (q) {
+                            cells.forEach(cell => highlightText(cell, q));
+                        }
+                    }
                 });
 
                 // Tampilkan pesan "tidak ditemukan" saat search aktif dan tidak ada yang cocok
@@ -137,7 +190,11 @@ function initDashboard() {
             });
         }
 
-        searchInput.addEventListener('input', filterTableBySearch);
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterTableBySearch, 200);
+        });
+
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 searchInput.value = '';
@@ -145,6 +202,14 @@ function initDashboard() {
                 searchInput.blur();
             }
         });
+
+        if (searchClear) {
+            searchClear.onclick = () => {
+                searchInput.value = '';
+                filterTableBySearch();
+                searchInput.focus();
+            };
+        }
     }
 
     /* ─ Logout confirm ─ */
