@@ -52,6 +52,10 @@
 
     {{-- ═══ TABS ═══ --}}
     <div class="modern-card" x-data="{ activeTab: localStorage.getItem('activeDetailTab') || 'umum' }" x-init="$watch('activeTab', value => localStorage.setItem('activeDetailTab', value)); $nextTick(() => localStorage.removeItem('activeDetailTab'))">
+        @php
+        $isEditMode = in_array($kegiatan->status, ['draft', 'revisi']);
+        $kesimpulanPimpinan = $kegiatan->kesimpulans->sortByDesc('id')->first();
+        @endphp
         {{-- Tab Navigation --}}
         <div class="md-tab-nav" id="tabNav">
             <button class="md-tab-btn" :class="{ 'active': activeTab === 'umum' }" @click="activeTab = 'umum'">
@@ -139,168 +143,172 @@
                     Selanjutnya <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
 
         {{-- ═══ TAB 2: Tujuan & Sasaran ═══ --}}
         <div class="tab-content mc-body" x-show="activeTab === 'tujuan'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" style="padding: 24px; display: none;">
             @php
-                $tujuanSasaran = $kegiatan->tujuans->first();
-                $isEditMode = in_array($kegiatan->status, ['draft', 'revisi']);
+            $tujuanSasaran = $kegiatan->tujuans->first();
+            $isEditMode = in_array($kegiatan->status, ['draft', 'revisi']);
             @endphp
 
             @if($isEditMode)
-                <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
-                    <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-bullseye" style="color: var(--accent);"></i>
-                        Form Tujuan & Sasaran Kerja Sama
-                    </div>
-
-                    {{-- Edit (update) jika data sudah ada --}}
-                    @if($tujuanSasaran)
-                        <form id="tujuanForm" action="{{ route('unit.kerjasama.tujuan.update', [$kegiatan->id, $tujuanSasaran->id]) }}" method="POST" style="margin: 0;">
-                            @csrf
-                            @method('PUT')
-                            <div class="mc-grid-2">
-                                <div class="mc-group">
-                                    <label class="mc-label">Tujuan Kegiatan <span class="mc-req">*</span></label>
-                                    <textarea name="tujuan" rows="4" required placeholder="Meningkatkan kompetensi praktis mahasiswa di bidang jaringan komputer melalui magang industri..."
-                                        class="mc-input no-icon" style="resize: vertical;">{{ old('tujuan', $tujuanSasaran->tujuan ?? '') }}</textarea>
-                                </div>
-                                <div class="mc-group">
-                                    <label class="mc-label">Sasaran Kegiatan <span class="mc-req">*</span></label>
-                                    <textarea name="sasaran" rows="4" required placeholder="Mahasiswa D3 Teknik Informatika Semester 5 (sebanyak 50 orang) dan 2 Dosen Pembimbing..."
-                                        class="mc-input no-icon" style="resize: vertical;">{{ old('sasaran', $tujuanSasaran->sasaran ?? '') }}</textarea>
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                <button type="button" @click="activeTab = 'umum'" class="rfc-btn" style="background: var(--surface); color: var(--text-sub); border: 1px solid var(--border);">
-                                    <i class="fas fa-arrow-left"></i> Kembali
-                                </button>
-                                <button type="submit" class="rfc-btn rfc-btn-primary">
-                                    <i class="fas fa-save"></i> Simpan
-                                </button>
-                            </div>
-                        </form>
-                    @else
-                        {{-- Create jika belum ada data --}}
-                        <form id="tujuanForm" action="{{ route('unit.kerjasama.tujuan.store', $kegiatan->id) }}" method="POST" style="margin: 0;">
-                            @csrf
-                            <div class="mc-grid-2">
-                                <div class="mc-group">
-                                    <label class="mc-label">Tujuan Kegiatan <span class="mc-req">*</span></label>
-                                    <textarea name="tujuan" rows="4" required placeholder="Meningkatkan kompetensi praktis mahasiswa..."
-                                        class="mc-input no-icon" style="resize: vertical;">{{ old('tujuan') }}</textarea>
-                                </div>
-                                <div class="mc-group">
-                                    <label class="mc-label">Sasaran Kegiatan <span class="mc-req">*</span></label>
-                                    <textarea name="sasaran" rows="4" required placeholder="Mahasiswa D3 Teknik Informatika Semester 5..."
-                                        class="mc-input no-icon" style="resize: vertical;">{{ old('sasaran') }}</textarea>
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                <button type="button" @click="activeTab = 'umum'" class="rfc-btn" style="background: var(--surface); color: var(--text-sub); border: 1px solid var(--border);">
-                                    <i class="fas fa-arrow-left"></i> Kembali
-                                </button>
-                                <button type="submit" class="rfc-btn rfc-btn-primary">
-                                    <i class="fas fa-save"></i> Simpan
-                                </button>
-                            </div>
-                        </form>
-                    @endif
-                </div>
-                {{-- List data yang sudah diinput --}}
-                <div style="margin-top: 24px;">
-                    <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-list-ul" style="color: var(--accent);"></i>
-                        Data Terdaftar
-                    </div>
-                    @foreach($kegiatan->tujuans as $t)
-                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,0.02);">
-                        <div style="margin-bottom: 16px; padding-right: 40px;">
-                            <div class="md-stat-label" style="margin-bottom: 6px;">Tujuan Kegiatan</div>
-                            <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->tujuan }}</div>
-                        </div>
-                        <div>
-                            <div class="md-stat-label" style="margin-bottom: 6px;">Sasaran Kegiatan</div>
-                            <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->sasaran }}</div>
-                        </div>
-                        <div style="position: absolute; top: 16px; right: 16px;">
-                            <form action="{{ route('unit.kerjasama.tujuan.destroy', [$kegiatan->id, $t->id]) }}" method="POST" onsubmit="return confirm('Hapus data tujuan & sasaran ini?')" style="display: inline;">
-                                @csrf @method('DELETE')
-                                <button type="submit" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--danger); cursor: pointer; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff';" onmouseout="this.style.background='var(--surface)'; this.style.color='var(--danger)';">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    @endforeach
+            <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-bullseye" style="color: var(--accent);"></i>
+                    Form Tujuan & Sasaran Kerja Sama
                 </div>
 
-                {{-- Button Selanjutnya (Hanya muncul jika sudah ada data) --}}
+                {{-- Edit (update) jika data sudah ada --}}
                 @if($tujuanSasaran)
-                <div style="margin-top: 20px; text-align: right;">
-                    <button type="button" @click="activeTab = 'pelaksanaan'" class="rfc-btn rfc-btn-primary">
-                        Selanjutnya <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-                @endif
-            @else
-                {{-- Read-only view --}}
-                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px;">
-                    <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-bullseye" style="color: var(--accent);"></i>
-                        Tujuan & Sasaran
+                <form id="tujuanForm" action="{{ route('unit.kerjasama.tujuan.update', [$kegiatan->id, $tujuanSasaran->id]) }}" method="POST" style="margin: 0;">
+                    @csrf
+                    @method('PUT')
+                    <div class="mc-grid-2">
+                        <div class="mc-group">
+                            <label class="mc-label">Tujuan Kegiatan <span class="mc-req">*</span></label>
+                            <textarea name="tujuan" rows="4" required placeholder="Meningkatkan kompetensi praktis mahasiswa di bidang jaringan komputer melalui magang industri..."
+                                class="mc-input no-icon" style="resize: vertical;">{{ old('tujuan', $tujuanSasaran->tujuan ?? '') }}</textarea>
+                        </div>
+                        <div class="mc-group">
+                            <label class="mc-label">Sasaran Kegiatan <span class="mc-req">*</span></label>
+                            <textarea name="sasaran" rows="4" required placeholder="Mahasiswa D3 Teknik Informatika Semester 5 (sebanyak 50 orang) dan 2 Dosen Pembimbing..."
+                                class="mc-input no-icon" style="resize: vertical;">{{ old('sasaran', $tujuanSasaran->sasaran ?? '') }}</textarea>
+                        </div>
                     </div>
 
-                    @forelse($kegiatan->tujuans as $t)
-                        <div style="margin-bottom: 20px; {{ !$loop->last ? 'border-bottom: 1px dashed var(--border); padding-bottom: 20px;' : '' }}">
-                            <div style="margin-bottom: 16px;">
-                                <div class="md-stat-label" style="margin-bottom: 6px;">Tujuan Kegiatan</div>
-                                <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->tujuan }}</div>
-                            </div>
-
-                            <div>
-                                <div class="md-stat-label" style="margin-bottom: 6px;">Sasaran Kegiatan</div>
-                                <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->sasaran }}</div>
-                            </div>
+                    <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <button type="button" @click="activeTab = 'umum'" class="rfc-btn" style="background: var(--surface); color: var(--text-sub); border: 1px solid var(--border);">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="submit" class="rfc-btn rfc-btn-primary">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+                @else
+                {{-- Create jika belum ada data --}}
+                <form id="tujuanForm" action="{{ route('unit.kerjasama.tujuan.store', $kegiatan->id) }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <div class="mc-grid-2">
+                        <div class="mc-group">
+                            <label class="mc-label">Tujuan Kegiatan <span class="mc-req">*</span></label>
+                            <textarea name="tujuan" rows="4" required placeholder="Meningkatkan kompetensi praktis mahasiswa..."
+                                class="mc-input no-icon" style="resize: vertical;">{{ old('tujuan') }}</textarea>
                         </div>
-                    @empty
-                        <div style="text-align: left; padding: 6px 0;">
-                            <div style="background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.22); border-radius: 12px; padding: 14px 16px; color: var(--text-sub);">
-                                <div style="display: flex; gap: 10px; align-items: flex-start;">
-                                    <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(245,158,11,.14); color: #f59e0b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 800; color: var(--text); font-size: 13px; margin-bottom: 6px;">
-                                            Data tujuan dan sasaran belum diinput.
-                                        </div>
-                                        <div style="font-size: 13px; color: var(--text-sub); line-height: 1.6;">
-                                            Silakan lengkapi data.
-                                        </div>
-                                        <div style="margin-top: 10px;">
-                                            <button type="button" onclick="alert('Lengkapi data hanya tersedia pada mode Edit (Draft/Revisi).');"
-                                                class="rfc-btn rfc-btn-primary" style="padding: 8px 14px; font-size: 12px;">
-                                                <i class="fas fa-pen-to-square"></i> Lengkapi Data
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="mc-group">
+                            <label class="mc-label">Sasaran Kegiatan <span class="mc-req">*</span></label>
+                            <textarea name="sasaran" rows="4" required placeholder="Mahasiswa D3 Teknik Informatika Semester 5..."
+                                class="mc-input no-icon" style="resize: vertical;">{{ old('sasaran') }}</textarea>
                         </div>
-                    @endforelse
-                </div>
+                    </div>
 
-                @if($tujuanSasaran)
-                <div style="margin-top: 20px; text-align: right;">
-                    <button type="button" @click="activeTab = 'pelaksanaan'" class="rfc-btn rfc-btn-primary">
-                        Selanjutnya <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
+                    <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <button type="button" @click="activeTab = 'umum'" class="rfc-btn" style="background: var(--surface); color: var(--text-sub); border: 1px solid var(--border);">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="submit" class="rfc-btn rfc-btn-primary">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
                 @endif
+            </div>
+            {{-- List data yang sudah diinput --}}
+            <div style="margin-top: 24px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-list-ul" style="color: var(--accent);"></i>
+                    Data Terdaftar
+                </div>
+                @foreach($kegiatan->tujuans as $t)
+                <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,0.02);">
+                    <div style="margin-bottom: 16px; padding-right: 40px;">
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Tujuan Kegiatan</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->tujuan }}</div>
+                    </div>
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Sasaran Kegiatan</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->sasaran }}</div>
+                    </div>
+                    <div style="position: absolute; top: 16px; right: 16px;">
+                        <form action="{{ route('unit.kerjasama.tujuan.destroy', [$kegiatan->id, $t->id]) }}" method="POST" onsubmit="return confirm('Hapus data tujuan & sasaran ini?')" style="display: inline;">
+                            @csrf @method('DELETE')
+                            <button type="submit" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--danger); cursor: pointer; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.background='var(--danger)'; this.style.color='#fff';" onmouseout="this.style.background='var(--surface)'; this.style.color='var(--danger)';">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            {{-- Button Selanjutnya (Hanya muncul jika sudah ada data) --}}
+            @if($tujuanSasaran)
+            <div style="margin-top: 20px; text-align: right;">
+                <button type="button" @click="activeTab = 'pelaksanaan'" class="rfc-btn rfc-btn-primary">
+                    Selanjutnya <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
             @endif
+            @else
+            {{-- Read-only view --}}
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px;">
+                <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-bullseye" style="color: var(--accent);"></i>
+                    Tujuan & Sasaran
+                </div>
+
+                @forelse($kegiatan->tujuans as $t)
+                <div style="margin-bottom: 20px; {{ !$loop->last ? 'border-bottom: 1px dashed var(--border); padding-bottom: 20px;' : '' }}">
+                    <div style="margin-bottom: 16px;">
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Tujuan Kegiatan</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->tujuan }}</div>
+                    </div>
+
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Sasaran Kegiatan</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-line;">{{ $t->sasaran }}</div>
+                    </div>
+                </div>
+                @empty
+                <div style="text-align: left; padding: 6px 0;">
+                    <div style="background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.22); border-radius: 12px; padding: 14px 16px; color: var(--text-sub);">
+                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+                            <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(245,158,11,.14); color: #f59e0b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 800; color: var(--text); font-size: 13px; margin-bottom: 6px;">
+                                    Data tujuan dan sasaran belum diinput.
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-sub); line-height: 1.6;">
+                                    Silakan lengkapi data.
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <button type="button" onclick="alert('Lengkapi data hanya tersedia pada mode Edit (Draft/Revisi).');"
+                                        class="rfc-btn rfc-btn-primary" style="padding: 8px 14px; font-size: 12px;">
+                                        <i class="fas fa-pen-to-square"></i> Lengkapi Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforelse
+            </div>
+
+            @if($tujuanSasaran)
+            <div style="margin-top: 20px; text-align: right;">
+                <button type="button" @click="activeTab = 'pelaksanaan'" class="rfc-btn rfc-btn-primary">
+                    Selanjutnya <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            @endif
+            @endif
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
 
         {{-- ═══ TAB 3: Pelaksanaan ═══ --}}
@@ -379,6 +387,8 @@
                     Selanjutnya <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
 
         {{-- ═══ TAB 4: Hasil & Capaian ═══ --}}
@@ -428,19 +438,34 @@
             <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,0.02);">
                 <div class="mc-grid-2">
                     @if($h->hasil_langsung)
-                    <div><div class="md-stat-label" style="margin-bottom: 4px;">Hasil Langsung</div><div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->hasil_langsung }}</div></div>
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Hasil Langsung</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->hasil_langsung }}</div>
+                    </div>
                     @endif
                     @if($h->dampak)
-                    <div><div class="md-stat-label" style="margin-bottom: 4px;">Dampak</div><div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->dampak }}</div></div>
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Dampak</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->dampak }}</div>
+                    </div>
                     @endif
                     @if($h->manfaat_mahasiswa)
-                    <div><div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Mahasiswa</div><div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_mahasiswa }}</div></div>
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Mahasiswa</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_mahasiswa }}</div>
+                    </div>
                     @endif
                     @if($h->manfaat_polimdo)
-                    <div><div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Polimdo</div><div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_polimdo }}</div></div>
+                    <div>
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Polimdo</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_polimdo }}</div>
+                    </div>
                     @endif
                     @if($h->manfaat_mitra)
-                    <div style="grid-column: 1 / -1;"><div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Mitra</div><div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_mitra }}</div></div>
+                    <div style="grid-column: 1 / -1;">
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Manfaat Mitra</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ $h->manfaat_mitra }}</div>
+                    </div>
                     @endif
                 </div>
                 @if($isEditMode)
@@ -469,6 +494,8 @@
                     Selanjutnya <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
 
         {{-- ═══ TAB 5: Permasalahan & Solusi ═══ --}}
@@ -561,6 +588,8 @@
                     Selanjutnya <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
 
         {{-- ═══ TAB 6: Dokumentasi ═══ --}}
@@ -625,8 +654,79 @@
                 Belum ada dokumentasi.
             </div>
             @endforelse
+
+            @include('auth.layout.unit._detail_tab_footer_kirim_revisi')
         </div>
     </div>
+
+    {{-- ═══ PERLU REVISI NOTIFICATION (Shared) ═══ --}}
+    @if($kegiatan->status === 'revisi')
+    <div style="margin-top: 24px; background: linear-gradient(135deg, rgba(245,158,11,.08), rgba(251,191,36,.05)); border: 1.5px solid rgba(245,158,11,.28); border-radius: 14px; padding: 20px 24px; display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(245,158,11,.14); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-pen-to-square" style="color: #d97706; font-size: 16px;"></i>
+        </div>
+        <div style="flex: 1; min-width: 240px;">
+            <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 4px;">Perlu Revisi — Catatan dari Pimpinan</div>
+            <div style="font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 16px;">Silakan sesuaikan data kerjasama sesuai ringkasan, saran, dan tindak lanjut berikut, lalu kirim ulang.</div>
+
+            @if($kesimpulanPimpinan)
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;">
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Ringkasan</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.65; white-space: pre-line;">{{ $kesimpulanPimpinan->ringkasan ?: '—' }}</div>
+                    </div>
+                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;">
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Saran</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.65; white-space: pre-line;">{{ $kesimpulanPimpinan->saran ?: '—' }}</div>
+                    </div>
+                    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;">
+                        <div class="md-stat-label" style="margin-bottom: 6px;">Tindak lanjut</div>
+                        <div style="font-size: 13px; color: var(--text); line-height: 1.65; white-space: pre-line;">{{ $kesimpulanPimpinan->tindak_lanjut ?: '—' }}</div>
+                    </div>
+                </div>
+            @else
+                <div style="font-size: 13px; color: var(--text-sub); background: rgba(245,158,11,.06); border: 1px dashed rgba(245,158,11,.35); border-radius: 12px; padding: 14px 16px;">
+                    Catatan kesimpulan dari Pimpinan belum tersedia di sistem. Hubungi Pimpinan jika diperlukan.
+                </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    @if(in_array($kegiatan->status, ['draft', 'revisi'], true))
+    <form id="submitToPimpinanForm" action="{{ route('unit.kerjasama.submit', $kegiatan->id) }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    @endif
+
+    {{-- ═══ SUBMIT TO PIMPINAN SECTION ═══ --}}
+    @if($kegiatan->status === 'draft')
+    <div style="margin-top: 24px; background: linear-gradient(135deg, rgba(79,70,229,.06), rgba(99,102,241,.04)); border: 1.5px solid rgba(79,70,229,.2); border-radius: 14px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 260px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #6366f1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-paper-plane" style="color: #fff; font-size: 16px;"></i>
+            </div>
+            <div>
+                <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 4px;">Kirim ke Pimpinan</div>
+                <div style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Pastikan semua data kerjasama sudah lengkap dan benar sebelum mengirim ke Pimpinan untuk dievaluasi.</div>
+            </div>
+        </div>
+
+        <button type="button" onclick="confirmSubmitKerjasamaUnit()" style="padding: 12px 28px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 14px rgba(79,70,229,.3); white-space: nowrap;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(79,70,229,.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(79,70,229,.3)';">
+            <i class="fas fa-paper-plane"></i> Kirim ke Pimpinan
+        </button>
+    </div>
+    @elseif($kegiatan->status === 'menunggu_evaluasi')
+    <div style="margin-top: 24px; background: linear-gradient(135deg, rgba(59,130,246,.06), rgba(96,165,250,.04)); border: 1.5px solid rgba(59,130,246,.2); border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 14px;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59,130,246,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-clock" style="color: #3b82f6; font-size: 16px;"></i>
+        </div>
+        <div>
+            <div style="font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 2px;">Menunggu Evaluasi Pimpinan</div>
+            <div style="font-size: 13px; color: var(--text-sub);">Data kerjasama telah dikirim dan sedang menunggu evaluasi dari Pimpinan.</div>
+        </div>
+    </div>
+    @endif
 
     {{-- Back button --}}
     <div style="margin-top: 24px;">
@@ -635,3 +735,64 @@
         </a>
     </div>
 </main>
+
+<script>
+    const KERJASAMA_UNIT_SUBMIT_IS_REVISI = @json($kegiatan->status === 'revisi');
+
+    function confirmSubmitKerjasamaUnit() {
+        const isRevisi = KERJASAMA_UNIT_SUBMIT_IS_REVISI;
+        const title = isRevisi ? 'Kirim ulang ke Pimpinan?' : 'Apakah Anda Sudah Yakin?';
+        const html = isRevisi ?
+            `<div style="text-align: left; font-size: 14px; color: #64748b; line-height: 1.7; margin-top: 8px;">
+                <p style="margin-bottom: 12px;">Anda akan mengirim kembali data yang <strong>sudah direvisi</strong> ke Pimpinan untuk evaluasi ulang.</p>
+                <p style="margin-bottom: 12px;">Pastikan perbaikan sudah mengikuti catatan Pimpinan pada bagian <strong>Perlu Revisi</strong>.</p>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Informasi Umum</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Tujuan & Sasaran</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Pelaksanaan</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Hasil & Capaian</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Permasalahan & Solusi</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Dokumentasi</span></div>
+                </div>
+                <p style="margin-top: 14px; color: #ef4444; font-weight: 600; font-size: 13px;">
+                    <i class="fas fa-info-circle"></i> Setelah dikirim, data tidak dapat diedit hingga Pimpinan mengevaluasi kembali.
+                </p>
+            </div>` :
+            `<div style="text-align: left; font-size: 14px; color: #64748b; line-height: 1.7; margin-top: 8px;">
+                <p style="margin-bottom: 12px;">Pastikan semua data berikut sudah terisi dengan benar:</p>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Informasi Umum</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Tujuan & Sasaran</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Pelaksanaan</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Hasil & Capaian</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Permasalahan & Solusi</span></div>
+                    <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #10b981; font-size: 13px;"></i><span>Dokumentasi</span></div>
+                </div>
+                <p style="margin-top: 14px; color: #4f46e5; font-weight: 600; font-size: 13px;">
+                    <i class="fas fa-info-circle"></i> Setelah dikirim, data tidak dapat diedit hingga Pimpinan mengevaluasi.
+                </p>
+            </div>`;
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: title,
+                html: html,
+                icon: isRevisi ? 'warning' : 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: isRevisi ? 'Ya, Kirim Ulang' : 'Ya, Kirim Sekarang',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('submitToPimpinanForm').submit();
+                }
+            });
+        } else {
+            if (confirm(isRevisi ? 'Kirim ulang data ke Pimpinan?' : 'Kirim data ke Pimpinan?')) {
+                document.getElementById('submitToPimpinanForm').submit();
+            }
+        }
+    }
+</script>

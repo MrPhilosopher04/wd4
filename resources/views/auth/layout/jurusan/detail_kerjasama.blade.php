@@ -97,7 +97,7 @@
                         </div>
                     </div>
                     <div>
-                        <div class="md-stat-label" style="margin-bottom: 4px;"></div>
+                        <div class="md-stat-label" style="margin-bottom: 4px;">Jurusan</div>
                         <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                             @forelse($kegiatan->jurusans as $jur)
                             <span class="tag tag-blue" style="font-size: 11px;">{{ $jur->nama_jurusan }}</span>
