@@ -1045,7 +1045,7 @@ function initNotifikasi() {
             const typeKey = (item.type || 'evaluasi').toString().toLowerCase();
             const typeBadgeClass = typeKey === 'revisi' ? 'revisi' : typeKey;
             const typeLabel = typeKey === 'revisi'
-                ? 'Sudah direvisi'
+                ? 'Sudah Revisi'
                 : (typeKey === 'evaluasi' ? 'Evaluasi' : typeKey.replace(/_/g, ' '));
 
             // Tentukan ikon & warna berdasarkan pengirim
