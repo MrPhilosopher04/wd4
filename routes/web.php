@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\MitraController;
 use App\Http\Controllers\Admin\JenisKerjasamaController;
+use App\Http\Controllers\Admin\UpelaksanaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardJurusanController;
 use App\Http\Controllers\Jurusan\KerjasamaJurusanController;
@@ -200,6 +201,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('mitra', MitraController::class);
     Route::resource('jkerjasama', JenisKerjasamaController::class);
+    Route::resource('upelaksana', UpelaksanaController::class);
     Route::get('/profiles', [DashboardController::class, 'profiles'])->name('admin.profiles');
 });
 

@@ -107,7 +107,7 @@
                 <div class="menu-icon"><i class="fas fa-tags"></i></div>
                 <span>Jenis Kerjasama</span>
             </a>
-            <a class="menu-item" href="#" data-page="jenis_kerjasama">
+            <a class="menu-item {{ request()->routeIs('upelaksana.*') ? 'active' : '' }}" href="{{ route('upelaksana.index') }}">
                 <div class="menu-icon"><i class="fas fa-sitemap"></i></div>
                 <span>Unit Pelaksana</span>
             </a>
