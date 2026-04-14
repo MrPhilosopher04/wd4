@@ -18,10 +18,10 @@
     <div class="card-wrapper">
 
         <!-- Floating status pill -->
-        <div class="float-pill">
+        {{-- <div class="float-pill">
             <div class="pill-dot"></div>
             <span class="pill-text">Sistem aktif & aman</span>
-        </div>
+        </div> --}}
 
         <div class="top-bar"></div>
         <div class="card">
