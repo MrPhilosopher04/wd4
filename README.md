@@ -86,9 +86,9 @@ php artisan test
 
 ### Role Akses:
 - Admin → full control
-- Jurusan → Input kegiatan (Tidak ada Evaluasi)
-- Pimpinan → Memberi penilaian & melakukan monitoring
-- Unit → Input & Evaluasi
+- Pimpinan → Memberi penilaian evaluasi & melakukan monitoring
+- Unit Kerja:
+    - Jurusan (Semua Jurusan) → Input kegiatan (Tidak ada Evaluasi)
 
 ### Flow:
 Jurusan / Unit Kerja
