@@ -1,5 +1,89 @@
 ## Pengembangan dan Implementasi Sistem Informasi Berbasis Web untuk Evaluasi Kerja Sama Kampus–Industri (Studi Kasus: Politeknik Negeri Manado)
 
+## Setup Standar
+
+README ini sebelumnya lebih fokus ke alur bisnis dan arsitektur. Bagian ini ditambahkan supaya developer baru bisa menjalankan project lebih cepat di local.
+
+### Kebutuhan Minimum
+- PHP 8.2
+- Composer
+- SQLite atau MySQL
+- Node.js dan npm opsional, hanya jika ingin mengelola aset frontend Vite
+
+### Setup Cepat
+1. Clone project lalu masuk ke root folder project.
+2. Install dependency PHP:
+
+```bash
+composer install
+```
+
+3. Buat file environment dari `.env.example` menjadi `.env`.
+4. Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+5. Siapkan database.
+
+Default project pada `.env.example` memakai SQLite:
+- pastikan file `database/database.sqlite` ada
+- lalu jalankan migration dan seeder:
+
+```bash
+php artisan migrate --seed
+```
+
+Jika ingin memakai MySQL:
+- ubah `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` di `.env`
+- lalu jalankan:
+
+```bash
+php artisan migrate --seed
+```
+
+6. Jalankan aplikasi:
+
+```bash
+php artisan serve
+```
+
+7. Buka aplikasi di browser:
+- Landing page: `http://127.0.0.1:8000/`
+- Login user: `http://127.0.0.1:8000/login`
+- Login admin: `http://127.0.0.1:8000/admin/login`
+
+### Akun Awal Seeder
+
+Seeder bawaan project membuat 4 role dan akun awal berikut. Semua akun memakai password default `password`.
+
+| Role | NIK | Nama |
+| --- | --- | --- |
+| unit_kerja | `123456` | Admin Unit |
+| jurusan | `222222` | Admin Jurusan |
+| pimpinan | `012460` | Admin Pimpinan |
+| admin | `120604` | Admin |
+
+### Catatan Menjalankan Project
+- Field login yang dipakai adalah `nik` dan `password`, bukan email.
+- Seeder utama dipanggil lewat `DatabaseSeeder` dan saat ini menjalankan `UsersSeeder`.
+- Aset utama aplikasi saat ini masih banyak dimuat dari `public/css` dan `public/js`, jadi frontend inti tetap bisa jalan tanpa `npm run dev`.
+- Jika ingin menyiapkan tool frontend bawaan Laravel, jalankan:
+
+```bash
+npm install
+npm run dev
+```
+
+### Testing
+
+Untuk menjalankan test bawaan:
+
+```bash
+php artisan test
+```
+
 ### Role Akses:
 - Admin → full control
 - Jurusan → Input kegiatan (Tidak ada Evaluasi)
