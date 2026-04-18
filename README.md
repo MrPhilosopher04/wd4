@@ -6,7 +6,7 @@
 - Unit Kerja:
     - Jurusan (Semua Jurusan) → Input kegiatan (Tidak ada Evaluasi)
 
-![Struktur Organisasi]([https://myoctocat.com/assets/images/base-octocat.svg](https://github.com/MrPhilosopher04/wd4/blob/wd4_delon/resources/image/Struktur-Organisasi-Polimdo-1536x871.png))
+![Struktur Organisasi](https://github.com/MrPhilosopher04/wd4/blob/e4f9dc5462c48e238a4685ccae3266c5f0e24677/resources/image/Struktur-Organisasi-Polimdo-1536x871.png)
 
 ### Flow:
 Jurusan / Unit Kerja
