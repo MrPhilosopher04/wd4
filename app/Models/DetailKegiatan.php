@@ -16,6 +16,8 @@ class DetailKegiatan extends Model
         'volume_luaran',
         'satuan_luaran',
         'keterangan',
+        'output',
+        'outcome',
         'tujuan',
         'indikator_kinerja',
     ];

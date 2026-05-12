@@ -231,6 +231,8 @@ class KerjasamaUnitController extends Controller
                             'volume_luaran' => $detailData['volume'] ?: null,
                             'satuan_luaran' => $detailData['satuan_volume'] ?: null,
                             'keterangan' => $detailData['keterangan'] ?: null,
+                            'output' => $detailData['output'] ?: null,
+                            'outcome' => $detailData['outcome'] ?: null,
                             'tujuan' => $detailData['tujuan'] ?: null,
                             'indikator_kinerja' => $detailData['indikator_kinerja'] ?: null,
                         ]);
@@ -467,6 +469,8 @@ class KerjasamaUnitController extends Controller
                             'volume_luaran' => $detailData['volume'] ?? null,
                             'satuan_luaran' => $detailData['satuan_volume'] ?? null,
                             'keterangan' => $detailData['keterangan'] ?? null,
+                            'output' => $detailData['output'] ?? null,
+                            'outcome' => $detailData['outcome'] ?? null,
                             'tujuan' => $detailData['tujuan'] ?? null,
                             'indikator_kinerja' => $detailData['indikator_kinerja'] ?? null,
                         ]);

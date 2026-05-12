@@ -440,10 +440,18 @@ $canAjukanPerpanjangan = $statusDokumen === 'Disahkan' && ! $isExtended && ($isE
                                                 <div style="font-weight: 700; color: var(--text); font-size: 14px;">
                                                     {{ $item->jenisKerjasama?->nama_kerjasama ?? '-' }}
                                                 </div>
-                                                @if($item->keterangan)
+                                                @if($item->keterangan || $item->output || $item->outcome)
                                                 <div
-                                                    style="font-size: 11px; color: var(--text-sub); margin-top: 5px; line-height: 1.4;">
-                                                    {{ $item->keterangan }}
+                                                    style="font-size: 11px; color: var(--text-sub); margin-top: 5px; line-height: 1.5; display: grid; gap: 4px;">
+                                                    @if($item->keterangan)
+                                                    <div><strong style="color: var(--text);">Keterangan:</strong> {{ $item->keterangan }}</div>
+                                                    @endif
+                                                    @if($item->output)
+                                                    <div><strong style="color: var(--text);">Output:</strong> {{ $item->output }}</div>
+                                                    @endif
+                                                    @if($item->outcome)
+                                                    <div><strong style="color: var(--text);">Outcome:</strong> {{ $item->outcome }}</div>
+                                                    @endif
                                                 </div>
                                                 @endif
                                             </td>
